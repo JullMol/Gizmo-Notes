@@ -1,7 +1,7 @@
 from flask import Flask
 
+app = Flask(__name__)
 def create_app():
-    app = Flask(__name__)
     from .home import home
     from .timer import timer
     from .group import group
