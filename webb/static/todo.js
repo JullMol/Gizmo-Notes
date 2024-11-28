@@ -28,11 +28,69 @@ document.addEventListener('DOMContentLoaded', function() {
         showView(eventView)
     });
 
+    // Fungsi untuk memuat tugas dari localStorage
+    function loadTasksFromLocalStorage(storageKey, tableSelector) {
+        const tasks = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        const tableBody = document.querySelector(tableSelector);
+        tableBody.innerHTML = ''; // Bersihkan tabel sebelum memuat
+
+        tasks.forEach(task => {
+            const newRow = document.createElement('tr');
+            newRow.setAttribute('data-id', task.id);
+            
+            // Sesuaikan dengan struktur masing-masing tabel
+            if (storageKey === 'dayTasks') {
+                newRow.innerHTML = `
+                    <td>${task.date}</td>
+                    <td>${task.time}</td>
+                    <td>${task.placement}</td>
+                    <td>${task.activities}</td>
+                    <td>${task.priority}</td>
+                    <td><button class="deleteButton">Delete</button></td>
+                `;
+            } else if (storageKey === 'assignmentTasks') {
+                newRow.innerHTML = `
+                    <td>${task.date}</td>
+                    <td>${task.time}</td>
+                    <td>${task.subject}</td>
+                    <td>${task.details}</td>
+                    <td>${task.priority}</td>
+                    <td><button class="deleteButton">Delete</button></td>
+                `;
+            } else if (storageKey === 'eventTasks') {
+                newRow.innerHTML = `
+                    <td>${task.date}</td>
+                    <td>${task.time}</td>
+                    <td>${task.location}</td>
+                    <td>${task.details}</td>
+                    <td>${task.priority}</td>
+                    <td><button class="deleteButton">Delete</button></td>
+                `;
+            }
+
+            // Tambahkan event listener untuk tombol delete
+            const deleteButton = newRow.querySelector('.deleteButton');
+            deleteButton.addEventListener('click', function() {
+                // Hapus dari localStorage
+                const tasks = JSON.parse(localStorage.getItem(storageKey) || '[]');
+                const filteredTasks = tasks.filter(t => t.id !== task.id);
+                localStorage.setItem(storageKey, JSON.stringify(filteredTasks));
+                
+                // Hapus baris dari tabel
+                newRow.remove();
+            });
+
+            tableBody.appendChild(newRow);
+        });
+    }
+
     function initializeDayView() {
         const addButton = document.querySelector('#dayView #addButton');
         if (addButton) {
             addButton.addEventListener('click', addDayTask);
         }
+        // Muat tugas dari localStorage
+        loadTasksFromLocalStorage('dayTasks', '#taskTable tbody');
     }
     
     function addDayTask() {
@@ -50,6 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
         // Buat objek tugas
         const task = {
+            id : Date.now(),
             date: dateInput.value,
             time: timeInput.value,
             placement: placementInput.value,
@@ -68,6 +127,11 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
+                 // Simpan ke localStorage
+                 let dayTasks = JSON.parse(localStorage.getItem('dayTasks') || '[]');
+                 dayTasks.push(task);
+                 localStorage.setItem('dayTasks', JSON.stringify(dayTasks));
+
                 // Tambahkan baris baru ke tabel
                 const taskTableBody = document.querySelector('#taskTable tbody');
                 const newRow = document.createElement('tr');
@@ -83,6 +147,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Tambahkan event listener untuk tombol delete
                 newRow.querySelector('.deleteButton').addEventListener('click', function() {
+                    // Hapus dari localStorage
+                    let dayTasks = JSON.parse(localStorage.getItem('dayTasks') || '[]');
+                    dayTasks = dayTasks.filter(t => t.id !== task.id);
+                    localStorage.setItem('dayTasks', JSON.stringify(dayTasks));
+
                     newRow.remove();
                 });
     
@@ -97,6 +166,12 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('Error:', error);
             alert('Gagal menyimpan tugas');
+
+            // Simpan ke localStorage meskipun backend gagal
+            let dayTasks = JSON.parse(localStorage.getItem('dayTasks') || '[]');
+            dayTasks.push(task);
+            localStorage.setItem('dayTasks', JSON.stringify(dayTasks));
+            addDayTaskToTable(task);
         });
     }
     
@@ -108,6 +183,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (addAssignmentButton) {
             addAssignmentButton.addEventListener('click', addAssignmentTask);
         }
+        // Muat tugas dari localStorage
+        loadTasksFromLocalStorage('assignmentTasks', '#assignmentTable tbody');
     }
     
     function addAssignmentTask() {
@@ -125,6 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
         // Buat objek tugas
         const task = {
+            id : Date.now(),
             date: dateInput.value,
             time: timeInput.value,
             subject: subjectInput.value,
@@ -143,6 +221,11 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
+                // Simpan ke localStorage
+                let assignmentTasks = JSON.parse(localStorage.getItem('assignmentTasks') || '[]');
+                assignmentTasks.push(task);
+                localStorage.setItem('assignmentTasks', JSON.stringify(assignmentTasks));
+
                 // Tambahkan baris baru ke tabel
                 const assignmentTableBody = document.querySelector('#assignmentTable tbody');
                 const newRow = document.createElement('tr');
@@ -158,6 +241,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Tambahkan event listener untuk tombol delete
                 newRow.querySelector('.deleteButton').addEventListener('click', function() {
+                    // Hapus dari localStorage
+                    let assignmentTasks = JSON.parse(localStorage.getItem('assignmentTasks') || '[]');
+                    assignmentTasks = assignmentTasks.filter(t => t.id !== task.id);
+                    localStorage.setItem('assignmentTasks', JSON.stringify(assignmentTasks));
+
                     newRow.remove();
                 });
     
@@ -172,6 +260,12 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('Error:', error);
             alert('Gagal menyimpan tugas');
+        
+            // Simpan ke localStorage meskipun backend gagal
+            let assignmentTasks = JSON.parse(localStorage.getItem('assignmentTasks') || '[]');
+            assignmentTasks.push(task);
+            localStorage.setItem('assignmentTasks', JSON.stringify(assignmentTasks));
+            addAssignmentTaskToTable(task);
         });
     }
     
@@ -183,9 +277,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (addEventButton) {
             addEventButton.addEventListener('click', addEventTask);
         }
+        // Muat tugas dari localStorage
+        loadTasksFromLocalStorage('eventTasks', '#eventTable tbody');
     }
     
-    const eventTasks = [];
     function addEventTask() {
         const dateInput = document.querySelector('#eventView #assignmentDate');
         const timeInput = document.querySelector('#eventView #assignmentTime');
@@ -201,6 +296,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
         // Buat objek tugas
         const task = {
+            id : Date.now(),
             date: dateInput.value,
             time: timeInput.value,
             location: locationInput.value,
@@ -219,6 +315,11 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
+                // Simpan ke localStorage
+                let eventTasks = JSON.parse(localStorage.getItem('eventTasks') || '[]');
+                eventTasks.push(task);
+                localStorage.setItem('eventTasks', JSON.stringify(eventTasks));
+
                 // Tambahkan baris baru ke tabel
                 const eventTableBody = document.querySelector('#eventTable tbody');
                 const newRow = document.createElement('tr');
@@ -234,6 +335,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Tambahkan event listener untuk tombol delete
                 newRow.querySelector('.deleteButton').addEventListener('click', function() {
+                     // Hapus dari localStorage
+                     let eventTasks = JSON.parse(localStorage.getItem('eventTasks') || '[]');
+                     eventTasks = eventTasks.filter(t => t.id !== task.id);
+                     localStorage.setItem('eventTasks', JSON.stringify(eventTasks));
+
                     newRow.remove();
                 });
     
@@ -248,6 +354,12 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('Error:', error);
             alert('Gagal menyimpan tugas');
+
+            // Simpan ke localStorage meskipun backend gagal
+            let eventTasks = JSON.parse(localStorage.getItem('eventTasks') || '[]');
+            eventTasks.push(task);
+            localStorage.setItem('eventTasks', JSON.stringify(eventTasks));
+            addEventTaskToTable(task);
         });
     }
     
