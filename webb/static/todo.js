@@ -166,12 +166,6 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('Error:', error);
             alert('Gagal menyimpan tugas');
-
-            // Simpan ke localStorage meskipun backend gagal
-            let dayTasks = JSON.parse(localStorage.getItem('dayTasks') || '[]');
-            dayTasks.push(task);
-            localStorage.setItem('dayTasks', JSON.stringify(dayTasks));
-            addDayTaskToTable(task);
         });
     }
     
@@ -221,10 +215,10 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                // Simpan ke localStorage
-                let assignmentTasks = JSON.parse(localStorage.getItem('assignmentTasks') || '[]');
-                assignmentTasks.push(task);
-                localStorage.setItem('assignmentTasks', JSON.stringify(assignmentTasks));
+                 // Simpan ke localStorage
+                 let assignmentTasks = JSON.parse(localStorage.getItem('assignmentTasks') || '[]');
+                 assignmentTasks.push(task);
+                 localStorage.setItem('assignmentTasks', JSON.stringify(assignmentTasks));
 
                 // Tambahkan baris baru ke tabel
                 const assignmentTableBody = document.querySelector('#assignmentTable tbody');
@@ -260,12 +254,6 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('Error:', error);
             alert('Gagal menyimpan tugas');
-        
-            // Simpan ke localStorage meskipun backend gagal
-            let assignmentTasks = JSON.parse(localStorage.getItem('assignmentTasks') || '[]');
-            assignmentTasks.push(task);
-            localStorage.setItem('assignmentTasks', JSON.stringify(assignmentTasks));
-            addAssignmentTaskToTable(task);
         });
     }
     
@@ -282,10 +270,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function addEventTask() {
-        const dateInput = document.querySelector('#eventView #assignmentDate');
-        const timeInput = document.querySelector('#eventView #assignmentTime');
-        const locationInput = document.querySelector('#eventView #assignmentSubject');
-        const detailsInput = document.querySelector('#eventView #assignmentDetails');
+        const dateInput = document.querySelector('#eventView #EventDate');
+        const timeInput = document.querySelector('#eventView #EventTime');
+        const locationInput = document.querySelector('#eventView #EventSubject');
+        const detailsInput = document.querySelector('#eventView #EventDetails');
         const priorityInput = document.querySelector('#eventView #eventPriority');
     
         // Validasi input
@@ -354,12 +342,6 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('Error:', error);
             alert('Gagal menyimpan tugas');
-
-            // Simpan ke localStorage meskipun backend gagal
-            let eventTasks = JSON.parse(localStorage.getItem('eventTasks') || '[]');
-            eventTasks.push(task);
-            localStorage.setItem('eventTasks', JSON.stringify(eventTasks));
-            addEventTaskToTable(task);
         });
     }
     
