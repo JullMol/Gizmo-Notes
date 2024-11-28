@@ -1,0 +1,98 @@
+<html>
+    <head>
+        <title>Calendar View</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <link rel="stylesheet" href="{{url_for('static', filename='test.css')}}">
+    </head>
+    
+    <body>
+        <div class="sidebar">
+            <div class="sidebar-content">
+                <h2>Workspace</h2>
+                <ul>
+                    <li><a href="search.html" id="searchLink" class="search-button"><i class="fas fa-search"></i> Search</a></li>
+                    <li><a href="home.html" id="homeLink"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="test.html"><i class="fas fa-inbox"></i> Inbox</a></li>
+                </ul>
+    
+                <h2>TRACK</h2>
+                <ul>
+                    <li><a href="timer.html" id="timerLink"><i class="fas fa-clock"></i> Timer</a></li>
+                </ul>
+    
+                <h2>NOTES</h2>
+                <ul>
+                    <li><a href="notesD.html" id="notesDLink"><i class="fas fa-sort-amount-down"></i> Notes Dates</a></li>
+                    <li><a href="notesG.html" id="notesGLink"><i class="fas fa-object-group"></i> Notes Grouped</a></li>
+                </ul>
+    
+                <h2>To Do List</h2>
+                <ul>
+                    <li><a href="Day.html" id="DayLink"><i class="fas fa-calendar-day"></i> Day</a></li>
+                    <li><a href="Assignment.html" id="AssignmentLink"><i class="fas fa-tasks"></i> Assignment</a></li>
+                    <li><a href="Event.html" id="EventLink"><i class="fas fa-calendar-alt"></i> Event</a></li>
+                </ul>
+    
+                <h2>MANAGE</h2>
+                <ul>
+                    <li><a href="Reports.html" id="ReportsLink"><i class="fas fa-file-alt"></i> Reports</a></li>
+                    <li><a href="Goals.html" id="GoalsLink"><i class="fas fa-bullseye"></i> Goals</a></li>
+                    <li><a href="Group.html" id="groupProjectLink"><i class="fas fa-users"></i> Group Project</a></li>
+                    <li><a href="Calendar.html" id="CalendarLink"><i class="fas fa-calendar-week"></i> Calendar</a></li>
+                    <li><a href="Project.html" id="ProjectsLink"><i class="fas fa-object-group"></i>Projects</a></li>
+                </ul>
+                </ul>
+            </div>
+    
+            <div class="bottom-links">
+                <ul>
+                    <li><a href="#"><i class="fas fa-info-circle"></i> Log Out</a></li>
+                    <li><a href="Invite.html" id="inviteMembersLink"><i class="fas fa-user-plus"></i> Invite Members</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Calendar View -->
+        <div class="calendar-view" id="calendarView">
+            <div class="calendar-container">
+                <div class="calendar-plan">{Calendar Plan}</div>
+                <div class="calendar-section">
+                    <div class="calendar">
+                        <div class="calendar-header">
+                            <button class="nav-btn" onclick="prevMonth()">&lt;</button>
+                            <div id="monthDisplay"></div>
+                            <button class="nav-btn" onclick="nextMonth()">&gt;</button>
+                        </div>
+                        <div class="calendar-grid" id="weekdays">
+                            <div class="day-header weekend">Su</div>
+                            <div class="day-header">Mo</div>
+                            <div class="day-header">Tu</div>
+                            <div class="day-header">We</div>
+                            <div class="day-header">Th</div>
+                            <div class="day-header">Fr</div>
+                            <div class="day-header weekend">Sa</div>
+                        </div>
+                        <div class="calendar-grid" id="calendar"></div>
+                    </div>
+        
+                    <div class="session-panel">
+                        <div class="session-header">
+                            <h3>Session</h3>
+                            <button class="add-session-btn" onclick="showAddSessionForm()">Add New</button>
+                        </div>
+                        <div id="sessionForm" style="display: none;" class="session-form">
+                            <input type="text" id="sessionName" placeholder="Session Name">
+                            <input type="color" id="sessionColor" value="#3b82f6">
+                            <div class="form-buttons">
+                                <button class="save-btn" onclick="saveSession()">Save</button>
+                                <button class="cancel-btn" onclick="cancelSessionForm()">Cancel</button>
+                            </div>
+                        </div>
+                        <div id="sessionList" class="session-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <script src="{{url_for('static', filename='calendar.js')}}"></script>
+    </body>
+</html>

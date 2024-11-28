@@ -1,0 +1,158 @@
+<html>
+    <head>
+        <title>Timer View</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <link rel="stylesheet" href="{{url_for('static', filename='test.css')}}">
+    </head>
+    
+    <body>
+        <div class="sidebar">
+            <div class="sidebar-content">
+                <h2>Workspace</h2>
+                <ul>
+                    <li><a href="search.html" id="searchLink" class="search-button"><i class="fas fa-search"></i> Search</a></li>
+                    <li><a href="home.html" id="homeLink"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="test.html"><i class="fas fa-inbox"></i> Inbox</a></li>
+                </ul>
+    
+                <h2>TRACK</h2>
+                <ul>
+                    <li><a href="timer.html" id="timerLink"><i class="fas fa-clock"></i> Timer</a></li>
+                </ul>
+    
+                <h2>NOTES</h2>
+                <ul>
+                    <li><a href="notesD.html" id="notesDLink"><i class="fas fa-sort-amount-down"></i> Notes Dates</a></li>
+                    <li><a href="notesG.html" id="notesGLink"><i class="fas fa-object-group"></i> Notes Grouped</a></li>
+                </ul>
+    
+                <h2>To Do List</h2>
+                <ul>
+                    <li><a href="Day.html" id="DayLink"><i class="fas fa-calendar-day"></i> Day</a></li>
+                    <li><a href="Assignment.html" id="AssignmentLink"><i class="fas fa-tasks"></i> Assignment</a></li>
+                    <li><a href="Event.html" id="EventLink"><i class="fas fa-calendar-alt"></i> Event</a></li>
+                </ul>
+    
+                <h2>MANAGE</h2>
+                <ul>
+                    <li><a href="Reports.html" id="ReportsLink"><i class="fas fa-file-alt"></i> Reports</a></li>
+                    <li><a href="Goals.html" id="GoalsLink"><i class="fas fa-bullseye"></i> Goals</a></li>
+                    <li><a href="Group.html" id="groupProjectLink"><i class="fas fa-users"></i> Group Project</a></li>
+                    <li><a href="Calendar.html" id="CalendarLink"><i class="fas fa-calendar-week"></i> Calendar</a></li>
+                    <li><a href="Project.html" id="ProjectsLink"><i class="fas fa-object-group"></i>Projects</a></li>
+                </ul>
+            </div>
+    
+            <div class="bottom-links">
+                <ul>
+                  <li><a href="#"><i class="fas fa-info-circle"></i> Log Out</a></li>
+                    <li><a href="Invite.html" id="inviteMembersLink"><i class="fas fa-user-plus"></i> Invite Members</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Timer View -->
+    <div class="timer-view" id="timerView">
+        <div class="timer-header">
+            <div class="time">
+                <span>00:00:00</span>
+                <i class="fas fa-play-circle play-button"></i>
+                <i class="fas fa-undo reset-timer"></i>
+            </div>
+            <div class="play-button">
+            </div>
+        </div>
+        
+        <div class="timer-body">
+            <div class="goals-header">
+                <span>Goals</span>
+                <span class="create-goals">+ Create Goals</span>
+            </div>
+            <div class="goals-content">
+                <textarea class="goals-textarea" placeholder="Enter your goals and notes here..."></textarea>
+                <button class="goals-save">Save Goals</button>
+                </div>
+            </div>
+
+            <div class="timer-calendar">
+                <div class="calendar-header">
+                    <div class="date">
+                      <i class="fas fa-chevron-left prev-month"></i>
+                      <span class="current-date">Today . Wed</span>
+                      <i class="fas fa-chevron-right next-month"></i>
+                      <div class="date-picker">
+                        <div class="calendar-nav">
+                          <i class="fas fa-chevron-left prev-month-picker"></i>
+                          <span class="calendar-month-year">November 2024</span>
+                          <i class="fas fa-chevron-right next-month-picker"></i>
+                        </div>
+                        <div class="calendar-grid">
+                          <!-- Days of week headers -->
+                          <div class="calendar-day-header">Sun</div>
+                          <div class="calendar-day-header">Mon</div>
+                          <div class="calendar-day-header">Tue</div>
+                          <div class="calendar-day-header">Wed</div>
+                          <div class="calendar-day-header">Thu</div>
+                          <div class="calendar-day-header">Fri</div>
+                          <div class="calendar-day-header">Sat</div>
+                          <!-- Calendar days will be inserted here by JavaScript -->
+                        </div>
+                      </div>
+                    </div>              
+                </div>
+                  <table class="time-management-table">
+                    <thead>
+                      <tr>
+                        <th>Time</th>
+                        <th>Task</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody class="time-management-table-body">
+                      <!-- Time slots will be added dynamically -->
+                    </tbody>
+                  </table>
+                  <div class="add-time-slot">
+                    <div class="time-input-row">
+                      <div class="time-section">
+                        <span class="time-label">Start:</span>
+                        <select class="time-dropdown hour-start">
+                          <option value="">Hr</option>
+                        </select>
+                        <select class="time-dropdown minute-start">
+                          <option value="">Min</option>
+                        </select>
+                        <select class="time-dropdown period-start">
+                          <option value="AM">AM</option>
+                          <option value="PM">PM</option>
+                        </select>
+                      </div>
+                      
+                      <span class="separator">to</span>
+                      
+                      <div class="time-section">
+                        <span class="time-label">End:</span>
+                        <select class="time-dropdown hour-end">
+                          <option value="">Hr</option>
+                        </select>
+                        <select class="time-dropdown minute-end">
+                          <option value="">Min</option>
+                        </select>
+                        <select class="time-dropdown period-end">
+                          <option value="AM">AM</option>
+                          <option value="PM">PM</option>
+                        </select>
+                      </div>
+                      
+                      <input type="text" placeholder="Enter task description" class="task-input" />
+                      <button class="save-time-slot">
+                        <i class="fas fa-plus"></i> Add Task
+                      </button>
+                    </div>
+                  </div>
+            </div>
+        </div>
+    </div>
+    <script src="{{url_for('static', filename='timer.js')}}"></script>
+    </body>
+</html>

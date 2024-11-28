@@ -1,0 +1,98 @@
+<html>
+    <head>
+        <title>Group Project</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <link rel="stylesheet" href="{{url_for('static', filename='test.css')}}">
+    </head>
+    
+    <body>
+        <div class="sidebar">
+            <div class="sidebar-content">
+                <h2>Workspace</h2>
+                <ul>
+                    <li><a href="search.html" id="searchLink" class="search-button"><i class="fas fa-search"></i> Search</a></li>
+                    <li><a href="home.html" id="homeLink"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="test.html"><i class="fas fa-inbox"></i> Inbox</a></li>
+                </ul>
+    
+                <h2>TRACK</h2>
+                <ul>
+                    <li><a href="timer.html" id="timerLink"><i class="fas fa-clock"></i> Timer</a></li>
+                </ul>
+    
+                <h2>NOTES</h2>
+                <ul>
+                    <li><a href="notesD.html" id="notesDLink"><i class="fas fa-sort-amount-down"></i> Notes Dates</a></li>
+                    <li><a href="notesG.html" id="notesGLink"><i class="fas fa-object-group"></i> Notes Grouped</a></li>
+                </ul>
+    
+                <h2>To Do List</h2>
+                <ul>
+                    <li><a href="Day.html" id="DayLink"><i class="fas fa-calendar-day"></i> Day</a></li>
+                    <li><a href="Assignment.html" id="AssignmentLink"><i class="fas fa-tasks"></i> Assignment</a></li>
+                    <li><a href="Event.html" id="EventLink"><i class="fas fa-calendar-alt"></i> Event</a></li>
+                </ul>
+    
+                <h2>MANAGE</h2>
+                <ul>
+                    <li><a href="Reports.html" id="ReportsLink"><i class="fas fa-file-alt"></i> Reports</a></li>
+                    <li><a href="Goals.html" id="GoalsLink"><i class="fas fa-bullseye"></i> Goals</a></li>
+                    <li><a href="Group.html" id="groupProjectLink"><i class="fas fa-users"></i> Group Project</a></li>
+                    <li><a href="Calendar.html" id="CalendarLink"><i class="fas fa-calendar-week"></i> Calendar</a></li>
+                    <li><a href="Project.html" id="ProjectsLink"><i class="fas fa-object-group"></i>Projects</a></li>
+                </ul>
+            </div>
+    
+            <div class="bottom-links">
+                <ul>
+                    <li><a href="#"><i class="fas fa-info-circle"></i> Log Out</a></li>
+                    <li><a href="Invite.html" id="inviteMembersLink"><i class="fas fa-user-plus"></i> Invite Members</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Group Project View -->
+        <div class="group-project-view" id="groupProjectView">
+            <h2>Group Project</h2>
+            
+            <div class="section-title">Members</div>
+            <table class="project-table" id="membersTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Num. Phone</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" placeholder="Enter name"></td>
+                        <td><input type="email" placeholder="Enter email"></td>
+                        <td><input type="tel" placeholder="Enter phone"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="add-row-btn" onclick="addRow('membersTable')">+ Add Member</button>
+
+            <div class="section-title">Schedule</div>
+            <table class="project-table" id="scheduleTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Subject</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="date"></td>
+                        <td><input type="text" placeholder="Enter subject"></td>
+                        <td><input type="url" placeholder="Enter link"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="add-row-btn" onclick="addRow('scheduleTable')">+ Add Schedule</button>
+        </div>
+        <script src="{{url_for('static', filename='group.js')}}"></script>
+    </body>
+</html>

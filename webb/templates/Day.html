@@ -1,0 +1,115 @@
+<html>
+    <head>
+        <title>To Do List Day</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <link rel="stylesheet" href="{{url_for('static', filename='test.css')}}">
+    </head>
+    
+    <body>
+        <div class="sidebar">
+            <div class="sidebar-content">
+                <h2>Workspace</h2>
+                <ul>
+                    <li><a href="search.html" id="searchLink" class="search-button"><i class="fas fa-search"></i> Search</a></li>
+                    <li><a href="home.html" id="homeLink"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="test.html"><i class="fas fa-inbox"></i> Inbox</a></li>
+                </ul>
+    
+                <h2>TRACK</h2>
+                <ul>
+                    <li><a href="timer.html" id="timerLink"><i class="fas fa-clock"></i> Timer</a></li>
+                </ul>
+    
+                <h2>NOTES</h2>
+                <ul>
+                    <li><a href="notesD.html" id="notesDLink"><i class="fas fa-sort-amount-down"></i> Notes Dates</a></li>
+                    <li><a href="notesG.html" id="notesGLink"><i class="fas fa-object-group"></i> Notes Grouped</a></li>
+                </ul>
+    
+                <h2>To Do List</h2>
+                <ul>
+                    <li><a href="Day.html" id="DayLink"><i class="fas fa-calendar-day"></i> Day</a></li>
+                    <li><a href="Assignment.html" id="AssignmentLink"><i class="fas fa-tasks"></i> Assignment</a></li>
+                    <li><a href="Event.html" id="EventLink"><i class="fas fa-calendar-alt"></i> Event</a></li>
+                </ul>
+    
+                <h2>MANAGE</h2>
+                <ul>
+                    <li><a href="Reports.html" id="ReportsLink"><i class="fas fa-file-alt"></i> Reports</a></li>
+                    <li><a href="Goals.html" id="GoalsLink"><i class="fas fa-bullseye"></i> Goals</a></li>
+                    <li><a href="Group.html" id="groupProjectLink"><i class="fas fa-users"></i> Group Project</a></li>
+                    <li><a href="Calendar.html" id="CalendarLink"><i class="fas fa-calendar-week"></i> Calendar</a></li>
+                    <li><a href="Project.html" id="ProjectsLink"><i class="fas fa-object-group"></i>Projects</a></li>
+                </ul>
+            </div>
+    
+            <div class="bottom-links">
+                <ul>
+                    <li><a href="#"><i class="fas fa-info-circle"></i> Log Out</a></li>
+                    <li><a href="Invite.html" id="inviteMembersLink"><i class="fas fa-user-plus"></i> Invite Members</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Day View -->
+        <div id="dayView">
+            <h2 class="title">To-Do List Day</h2>
+            <div class="dayD">
+                <!-- Grid Container -->
+                <div class="inputGrid">
+                    <!-- Kolom 1 -->
+                    <div class="inputColumn">
+                        <label for="taskDate">Date:</label>
+                        <input type="date" id="taskDate" />
+        
+                        <label for="taskTime">Time:</label>
+                        <input type="time" id="taskTime" />
+                    </div>
+        
+                    <!-- Kolom 2 -->
+                    <div class="inputColumn">
+                        <label for="taskPlace">Placement:</label>
+                        <input type="text" id="taskPlace" placeholder="Enter placement" />
+        
+                        <label for="taskInput">Activities:</label>
+                        <input type="text" id="taskActivities" placeholder="Enter activities" />
+                    </div>
+                </div>
+
+                <div class="priorityContainer">
+                    <label for="taskPriority">Priority:</label>
+                    <select id="taskPriority">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>            
+
+                <!-- Tombol Add -->
+                <div class="buttonContainer">
+                    <button id="addButton">Add</button>
+                </div>
+            </div>
+
+            <!-- Bagian Tabel -->
+            <div id="taskTableContainer">
+                <table id="taskTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Placement</th>
+                            <th>Activities</th>
+                            <th>Priority</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data tabel akan diisi secara dinamis -->
+                    </tbody>
+                </table>
+            </div>
+        </div>    
+        <script src="{{url_for('static', filename='todo.js')}}"></script>
+    </body>
+</html>

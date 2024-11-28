@@ -1,0 +1,1757 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #1a1f37;
+    color: white;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 240px;
+    height: 100vh;
+    background-color: #262b4d;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-content {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #323865 #262b4d;
+}
+
+.sidebar-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
+    background: #262b4d;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+    background: #323865;
+    border-radius: 3px;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb:hover {
+    background: #404680;
+}
+
+.sidebar h2 {
+    font-size: 16px;
+    margin: 20px 0 10px;
+    color: #8388a8;
+    position: sticky;
+    top: 0;
+    background-color: #262b4d;
+    padding: 5px 0;
+    z-index: 1;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 15px 0;
+}
+
+.sidebar ul li {
+    margin-bottom: 8px;
+}
+
+.sidebar ul li a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.sidebar ul li a i {
+    margin-right: 10px;
+    width: 20px;
+    color: #8388a8;
+}
+
+.sidebar ul li a:hover {
+    background-color: #323865;
+}
+
+.submenu {
+    list-style: none;
+    display: none;
+    margin-left: 25px;
+    margin-top: 5px;
+}
+
+.submenu.active {
+    display: block;
+}
+
+.submenu li a {
+    font-size: 13px ;
+    padding: 6px 12px;
+    color: #8388a8;
+}
+
+.submenu li a:hover {
+    color: white !;
+}
+
+.bottom-links {
+    padding: 15px;
+    background-color: #262b4d;
+    border-top: 1px solid #323865;
+}
+
+.bottom-links ul {
+    margin: 0;
+}
+
+.main-content {
+    margin-left: 240px;
+    padding: 30px;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.timer-view {
+    display: none;
+    margin-left: 240px;
+    height: 100vh;
+    background-color: #1a1f37;
+    color: white;
+}
+
+.timer-header {
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.timer-header .time {
+    color: #fff;
+    font-size: 14px;
+}
+
+.timer-body {
+    padding: 20px;
+}
+
+.timer-calendar {
+    background-color: #262b4d;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.goals-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #262b4d;
+    margin-bottom: 20px;
+}
+
+.home-view {
+    display: block;
+}
+
+/* Search Bar */
+.search-container {
+    margin-bottom: 30px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px;
+    background-color: #262b4d;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-size: 16px;
+    border: 1px solid #ccc;
+}
+
+.search-button {
+    background-color: #7b6ef6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 5px;
+}
+
+.search-button:hover {
+    background-color: #e9d5ff;
+}
+
+.results-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.result-card {
+    background-color: #262b4d;
+    border-radius: 8px;
+    padding: 20px;
+    min-height: 200px;
+}
+
+.section {
+    margin-bottom: 25px;
+}
+
+.section h2 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #8388a8;
+}
+
+.recently-visited, .upcoming-events, .activity-reports {
+    background-color: #262b4d;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.item {
+    width: 80px;
+    height: 80px;
+    background-color: #323865;
+    border-radius: 12px;
+    display: inline-block;
+    margin-right: 15px;
+    margin-bottom: 15px;
+}
+
+.upcoming-events {
+    height: 180px;
+    margin: 25px 0;
+}
+
+/* Main content views */
+.main-content, .timer-view, .group-project-view {
+    margin-left: 240px;
+    padding: 30px;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.class-notes {
+    border-radius: 20px;
+    background-color: #2B2E4A;
+    color: white;
+    padding: 20px;
+    position: absolute; /* Mengubah posisi menjadi absolute */
+    top: 0; /* Atur posisi dari atas */
+    left: 240px; /* Sesuaikan dengan lebar sidebar */
+    width: calc(100% - 240px); /* Mengatur lebar agar sesuai dengan tampilan */
+    overflow-y: auto; /* Tambahkan scroll jika konten melebihi tinggi */
+    overflow-x: auto;
+}
+
+.class-notes h2 {
+    text-align: left;
+    margin-bottom: 20px;
+    color: #efc0f1;
+}
+
+.note-grid {
+    display: flex; /* Ubah menjadi flex untuk scroll horizontal */
+    overflow-x: auto; /* Tambahkan scroll horizontal */
+    gap: 10px; /* Jarak antar kartu catatan */
+    margin-bottom: 20px;
+    padding-bottom: 20px; /* Tambahkan padding di bagian bawah */
+    scrollbar-width: thin; /* Mengatur lebar scrollbar */
+    scrollbar-color: transparent transparent; /* Warna scrollbar */
+    grid-template-columns: repeat(7, 1fr); /* Mengatur menjadi 7 kolom */
+}
+
+.note-grid::-webkit-scrollbar {
+    height: 8px;
+}
+
+.note-grid::-webkit-scrollbar-thumb {
+    background: transparent; /* Warna scrollbar */
+    border-radius: 10px; /* Sudut membulat scrollbar */
+}
+
+.note-grid::-webkit-scrollbar-track {
+    background: transparent; /* Warna track scrollbar */
+}
+
+.note-card {
+    flex: 0 0 auto;
+    width: 200px;
+    background-color: #2B2E4A;
+    border-radius: 8px;
+    text-align: center;
+    padding: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.note-card img {
+    width: 100%;
+    border-radius: 5px;
+    height: 100%;
+    object-fit: cover;
+}
+
+.note-card p {
+    margin-top: 10px ;
+    font-size: 14px;
+    color: #bdc3c7;
+}
+
+.saved-notes {
+    margin-top: 10px; /* Menambahkan jarak antara gambar dan tabel */
+}
+
+.notes-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #2B2E4A; /* Warna latar belakang tabel */
+    color: white; /* Warna teks */
+}
+
+.notes-table th, .notes-table td {
+    border: 1px solid #7b6ef6;
+    padding: 8px;
+    text-align: left;
+}
+
+/* CSS untuk Grouped Notes */
+.class-notes-grouped {
+    background-color: #2B2E4A;
+    color: white;
+    padding: 20px;
+    position: absolute;
+    top: 0;
+    left: 240px;
+    width: calc(100% - 240px);
+    overflow-y: hidden;
+    overflow-x: auto;
+}
+
+.class-notes-grouped h2 {
+    text-align: left;
+    margin-bottom: 20px;
+    color: #efc0f1;
+}
+
+.note-grid-grouped {
+    display: flex; /* Menggunakan flex untuk layout */
+    overflow-x: auto; /* Scroll horizontal jika diperlukan */
+    gap: 10px; /* Jarak antar kartu catatan */
+    padding-bottom: 20px; /* Tambahkan padding di bagian bawah */
+    scrollbar-width: none;
+}
+
+.note-card-grouped::-webkit-scrollbar {
+    display: none;
+}
+
+.note-card-grouped {
+    flex: 0 0 auto; /* Menghindari flex grow */
+    width: 200px; /* Lebar tetap untuk kartu */
+    background-color: #2B2E4A;
+    border-radius: 8px;
+    text-align: center;
+    padding: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.note-card-grouped img {
+    width: 100%;
+    border-radius: 5px;
+    height: 100%;
+    object-fit: cover;
+}
+
+.note-card-grouped p {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #bdc3c7;
+}
+
+.create-note-modal {
+    display: none; /* Sembunyikan modal secara default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #262b4d; /* Warna latar belakang modal */
+    padding: 20px; /* Ruang dalam modal */
+    border-radius: 8px; /* Sudut membulat untuk modal */
+    width: 90%; /* Lebar modal */
+    max-width: 600px; /* Lebar maksimum modal */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); /* Bayangan modal */
+    margin: 0 auto; /* Pusatkan modal */
+}
+
+.modal-title {
+    color: #000000; /* Warna teks yang cerah */
+    font-size: 24px; /* Ukuran font lebih besar */
+    font-weight: bold; /* Membuat teks lebih tebal */
+    margin: 0 0 15px 0; /* Tambahkan margin bawah untuk memberi ruang */
+    text-align: center; /* Pusatkan teks */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Tambahkan bayangan teks */
+    padding: 10px; /* Tambahkan ruang dalam */
+    border-radius: 8px; /* Bulatkan sudut */
+    background-color: rgb(255, 0, 255); /* Warna latar belakang semi-transparan */
+    transition: all 0.3s ease; /* Transisi halus untuk semua perubahan */
+}
+
+.create-note-modal:hover .modal-title {
+    transform: scale(1.05); /* Membesarkan sedikit saat hover */
+    color: #efc0f1; /* Warna saat hover */
+    background-color: rgb(0, 68, 255);
+}
+
+.note-textarea {
+    width: 100%;
+    min-height: 300px;
+    max-height: 500px;
+    background-color: #1b1b2f;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    resize: vertical;
+}
+
+.note-editor {
+    width: calc(100% - 30px); /* Mengurangi lebar untuk memberikan ruang di samping */
+    min-height: 300px; /* Tinggi minimum editor */
+    max-height: 500px; /* Tinggi maksimum editor */
+    background-color: #1b1b2f; /* Warna latar belakang */
+    color: white; /* Warna teks */
+    border: 1px solid #7b6ef6; /* Border */
+    border-radius: 8px; /* Sudut membulat */
+    padding: 15px; /* Ruang dalam */
+    overflow-y: auto; /* Scroll vertikal jika konten melebihi tinggi */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3); /* Bayangan dalam */
+    font-family: Arial, sans-serif; /* Gaya font */
+    margin: 0 auto; /* Mengatur margin otomatis untuk pusat */
+    box-sizing: border-box; /* Memastikan padding dan border dihitung dalam lebar total */
+}
+
+.note-editor img {
+    max-width: 100%; /* Agar gambar tidak melebihi lebar editor */
+    border-radius: 8px; /* Sudut membulat untuk gambar */
+    cursor: nwse-resize; /* Menunjukkan bahwa gambar dapat diubah ukurannya */
+}
+
+.save-note-btn, .close-modal-btn {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #7b6ef6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.save-note-btn:hover, .close-modal-btn:hover {
+    background-color: #e9d5ff;
+}
+
+/* Group Project specific styles */
+.group-project-view {
+    display: none;
+    background-color: #1a1f37;
+}
+
+.project-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    background-color: #262b4d;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.project-table th {
+    background-color: #e9d5ff;
+    color: #262b4d;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.project-table td {
+    padding: 12px;
+    border-bottom: 1px solid #323865;
+}
+
+.project-table input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 4px;
+    font-size: 14px;
+}
+
+.project-table input:focus {
+    outline: none;
+    background-color: #323865;
+    border-radius: 4px;
+}
+
+.section-title {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #8388a8;
+}
+
+.add-row-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.add-row-btn:hover {
+    background-color: #45a049;
+}
+
+/* Tambahan untuk input type date */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+/* Tambahkan atau update CSS ini */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+}
+
+.modal-overlay.active {
+    display: block;
+}
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #262b4d;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    z-index: 10000;
+}
+
+.modal-header {
+    margin-bottom: 20px;
+    background-color: #e9d5ff;
+}
+
+.modal-title {
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px;
+    background-color: #323865;
+    border: 1px solid #404680;
+    border-radius: 6px;
+    color: white;
+    margin-bottom: 15px;
+}
+
+.search-input::placeholder {
+    color: #8388a8;
+}
+
+.workspace-select {
+    width: calc(100% - 100px);
+    padding: 10px;
+    background-color: #323865;
+    border: 1px solid #404680;
+    border-radius: 6px;
+    color: white;
+    margin-right: 10px;
+}
+
+.bottom-container {
+    display: flex;
+    align-items: center;
+}
+
+.modal-invite-btn {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 90px;
+}
+
+.modal-invite-btn:hover {
+    background-color: #45a049;
+}
+
+.success-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 4px;
+    display: none;
+    z-index: 10001;
+    animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(-20px); }
+    20% { opacity: 1; transform: translateY(0); }
+    80% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-20px); }
+}
+
+/* Add validation styles */
+.input-error {
+    border: 1px solid #ff4444 !important;
+}
+
+.error-message {
+    color: #ff4444;
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+}
+
+.timer-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.timer-header .time {
+    display: flex;
+    align-items: center;
+    background-color: #1f4068;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-left: auto;
+}
+.timer-header .time i {
+    margin-left: 10px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #ffcc00;
+}
+.goals {
+    background-color: #1f4068;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+.goals-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.create-goals {
+    color: #ffcc00;
+    cursor: pointer;
+}
+.goals-content {
+    display: none;
+    background-color: #1b1b2f;
+    padding: 15px;
+    border-radius: 5px;
+}
+.goals-content.active {
+    display: block;
+}
+.goals-textarea {
+    width: 100%;
+    min-height: 100px;
+    background-color: #162447;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    resize: vertical;
+}
+.goals-save {
+    background-color: #ffcc00;
+    color: #000;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.list-view-table, .day-view-table, .assignment-view-table, .event-view-table {
+    display: none; /* Sembunyikan semua tabel secara default */
+}
+
+.calendar {
+    background-color: #1b1b2f;
+    padding: 20px;
+    border-radius: 5px;
+    flex-grow: 1;
+}
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.calendar-header .date {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+}
+.calendar-header .date i {
+    cursor: pointer;
+    color: #ffcc00;
+}
+.calendar-header .view-toggle {
+    background-color: #1f4068;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.date-picker {
+    display: none;
+    position: absolute;
+    background-color: #1f4068;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    top: 100%;
+    left: 0;
+}
+.date-picker.active {
+    display: block;
+}
+.calendar-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.calendar-month-year {
+    font-weight: bold;
+}
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+.calendar-day-header {
+    text-align: center;
+    font-weight: bold;
+    padding: 5px;
+}
+.calendar-day {
+    text-align: center;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.calendar-day:hover {
+    background-color: #162447;
+}
+.calendar-day.current {
+    background-color: #ffcc00;
+    color: #000;
+}
+.calendar-day.selected {
+    background-color: #4a90e2;
+}
+.time-management-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+.time-management-table th, .time-management-table td {
+    border: 1px solid #1f4068;
+    padding: 10px;
+    text-align: left;
+}
+.time-management-table th {
+    background-color: #1f4068;
+}
+.time-management-table td {
+    background-color: #1b1b2f;
+}
+.add-time-slot {
+  background-color: #1f4068;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.time-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.time-section {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #162447;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.time-label {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  margin-right: 5px;
+}
+
+.time-dropdown {
+  background-color: #1b1b2f;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px;
+  cursor: pointer;
+  min-width: 60px;
+  transition: all 0.2s ease;
+}
+
+.time-dropdown:hover {
+  background-color: #2a2a4a;
+}
+
+.time-dropdown:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 204, 0, 0.3);
+}
+
+.separator {
+  color: #fff;
+  margin: 0 10px;
+  font-weight: bold;
+}
+
+.task-input {
+  flex: 1;
+  background-color: #162447;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 15px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.task-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 204, 0, 0.3);
+  background-color: #1b1b2f;
+}
+
+.save-time-slot {
+  background-color: #ffcc00;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.save-time-slot:hover {
+  background-color: #ffd633;
+  transform: translateY(-1px);
+}
+
+.save-time-slot:active {
+  transform: translateY(1px);
+}
+
+.time-management-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.time-management-table th {
+  background-color: #1f4068;
+  color: #fff;
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #162447;
+}
+
+.time-management-table td {
+  background-color: #1b1b2f;
+  padding: 12px;
+  border-bottom: 1px solid #162447;
+  transition: background-color 0.2s ease;
+}
+
+.time-management-table tr:hover td {
+  background-color: #242450;
+}
+
+.time-management-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Animation for new rows */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.time-management-table tr {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Judul */
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 20px;
+    margin-left: 420px; /* Sesuaikan agar tidak tertutup sidebar */
+}
+
+/* Tata Letak Umum */
+#dayView {
+    display: flex;
+    flex-direction: column; /* Agar judul tetap di atas */
+    padding: 20px;
+    margin-left: 250px; /* Hindari tertutup sidebar */
+    height: calc(100vh - 40px); /* Sesuaikan tinggi dengan viewport */
+    overflow-y: auto; /* Tambahkan scroll secara vertikal */
+    overflow-x: hidden; /* Hindari scroll horizontal */
+}
+
+/* Bagian Form */
+.dayD {
+    background-color: #1e2a3a; /* Warna tema */
+    color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 95%; /* Memenuhi lebar */
+    max-width: none; /* Tidak dibatasi */
+    margin-bottom: 20px;
+}
+
+/* Grid untuk Kolom Input */
+.inputGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dua kolom */
+    gap: 20px; /* Jarak antar kolom */
+}
+
+/* Kolom Input */
+.inputColumn label {
+    display: block;
+    margin-bottom: 5px;
+    color: #ccc;
+}
+
+.inputColumn input {
+    width: 100%; /* Memenuhi lebar kolom */
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #2a3e55;
+    color: #fff;
+}
+
+/* Tombol Add */
+.buttonContainer {
+    grid-column: span 2; /* Tombol di bawah dua kolom */
+    text-align: center;
+    margin-top: 15px;
+}
+
+#addButton {
+    background-color: #ffcc00;
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#addButton:hover {
+    background-color: #ffcc00;
+}
+
+/* Bagian Tabel */
+#taskTableContainer {
+    max-width: 100%;
+    background-color: #1e2a3a;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+#taskTable {
+    width: 100%;
+    border-collapse: collapse;
+    color: #fff;
+}
+
+#taskTable th, #taskTable td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+    background-color: #2a3e55;
+}
+
+#taskTable th {
+    background-color: #34495e;
+}
+
+#taskTable .deleteButton {
+    background-color: white; /* Warna awal (netral) */
+    color: #e74c3c; /* Teks merah */
+    border: 1px solid #e74c3c; /* Border merah */
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease; /* Transisi untuk efek yang halus */
+}
+
+#taskTable .deleteButton:hover {
+    background-color: #e74c3c; /* Background berubah merah */
+    color: white; /* Teks berubah menjadi putih */
+}
+
+.priorityContainer {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.priorityContainer label {
+    margin-bottom: 5px;
+    color: white;
+}
+
+#taskPriority {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: #34495e;
+    color: white;
+}
+
+#assignmentView {
+    display: flex;
+    flex-direction: column; /* Agar judul tetap di atas */
+    padding: 20px;
+    margin-left: 250px; /* Hindari tertutup sidebar */
+    height: calc(100vh - 40px); /* Sesuaikan tinggi dengan viewport */
+    overflow-y: auto; /* Tambahkan scroll secara vertikal */
+    overflow-x: hidden; /* Hindari scroll horizontal */
+}
+
+#assignmentTableContainer {
+    max-width: 100%;
+    background-color: #1e2a3a;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+#assignmentTable {
+    width: 100%;
+    border-collapse: collapse;
+    color: #fff;
+}
+
+#assignmentTable th, #assignmentTable td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+    background-color: #2a3e55;
+}
+
+#assignmentTable th {
+    background-color: #34495e;
+}
+
+#assignmentTable .deleteButton {
+    background-color: white; /* Warna awal (netral) */
+    color: #e74c3c; /* Teks merah */
+    border: 1px solid #e74c3c; /* Border merah */
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease; /* Transisi untuk efek yang halus */
+}
+
+#assignmentTable .deleteButton:hover {
+    background-color: #e74c3c; /* Background berubah merah */
+    color: white; /* Teks berubah menjadi putih */
+}
+
+#assignmentPriority {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: #34495e;
+    color: white;
+}
+
+#addAssignmentButton {
+    background-color: #ffcc00;
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#addAssignmentButton:hover {
+    background-color: #ffcc00;
+}
+
+#eventView {
+    display: flex;
+    flex-direction: column; /* Agar judul tetap di atas */
+    padding: 20px;
+    margin-left: 250px; /* Hindari tertutup sidebar */
+    height: calc(100vh - 40px); /* Sesuaikan tinggi dengan viewport */
+    overflow-y: auto; /* Tambahkan scroll secara vertikal */
+    overflow-x: hidden; /* Hindari scroll horizontal */
+}
+
+#eventTableContainer {
+    max-width: 100%;
+    background-color: #1e2a3a;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+#eventTable {
+    width: 100%;
+    border-collapse: collapse;
+    color: #fff;
+}
+
+#eventTable th, #eventTable td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+    background-color: #2a3e55;
+}
+
+#eventTable th {
+    background-color: #34495e;
+}
+
+#eventTable .deleteButton {
+    background-color: white; /* Warna awal (netral) */
+    color: #e74c3c; /* Teks merah */
+    border: 1px solid #e74c3c; /* Border merah */
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease; /* Transisi untuk efek yang halus */
+}
+
+#eventTable .deleteButton:hover {
+    background-color: #e74c3c; /* Background berubah merah */
+    color: white; /* Teks berubah menjadi putih */
+}
+
+#eventPriority {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: #34495e;
+    color: white;
+}
+
+#addEventButton {
+    background-color: #ffcc00;
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#addEventButton:hover {
+    background-color: #ffcc00;
+}
+
+/* beginning css Goals */
+#goalsView {
+    /* display: flex; */
+    /* flex-direction: column; */
+    padding: 20px;
+    margin-left: 250px;
+    /* height: calc(100vh - 40px); */
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.card {
+    background-color: #0f172a;
+    border-radius: 0.5rem;
+    width: 100%;
+    max-width: 1000px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.card-subtitle {
+    font-size: 1.1rem;
+    color: #94a3b8;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+th {
+    background-color: rgba(168, 85, 247, 0.2);
+    padding: 0.75rem;
+    text-align: left;
+}
+
+td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #334155;
+}
+
+.editable {
+    background: transparent;
+    border: none;
+    color: white;
+    width: 100%;
+    padding: 0.25rem;
+}
+
+.editable:focus {
+    outline: 1px solid #6366f1;
+    background-color: rgba(99, 102, 241, 0.1);
+    border-radius: 0.25rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    transition: background-color 0.2s;
+}
+
+.btn-primary {
+    background-color: #a855f7;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #9333ea;
+}
+
+.btn-ghost {
+    background-color: transparent;
+    color: #ef4444;
+}
+
+.btn-ghost:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+.btn-save {
+    color: #22c55e;
+}
+
+.btn-cancel {
+    color: #ef4444;
+}
+
+.status-timeout {
+    color: #ef4444;
+    font-weight: bold;
+}
+
+.status-pending {
+    color: #fbbf24;
+}
+
+.hidden {
+    display: none;
+}
+
+.new-goal-row td {
+    background-color: rgba(99, 102, 241, 0.1);
+}
+
+/* Date input styling */
+input[type="datetime-local"] {
+    background: transparent;
+    border: none;
+    color: white;
+    width: 100%;
+    padding: 0.25rem;
+}
+
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+/* Notification styling */
+.notification {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background-color: #ef4444;
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.notification.show {
+    opacity: 1;
+}
+/* Finished CSS Goals */
+
+/* p reports */
+#reportsView {
+    /* display: flex; */
+    /* flex-direction: column; */
+    padding: 20px;
+    margin-left: 250px;
+    /* height: calc(100vh - 40px); */
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+/* sampek sini bro */
+.header {
+    text-align: right;
+    padding: 20px;
+    background-color: #243447;
+}
+.header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+.header p {
+    margin: 5px 0 0;
+    font-size: 18px;
+}
+/* Beginning css Reports */
+.container { 
+    display: flex; 
+    justify-content: space-between;
+    padding: 20px;
+}
+.report-section {
+    width: 48%;
+}
+.report-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #2C3E50;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+.report-header i {
+    margin: 0 10px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+.report-header i:hover {
+    opacity: 1;
+}
+.report-header span {
+    font-size: 18px;
+    min-width: 150px;
+    text-align: center;
+}
+.chart {
+    background-color: #2C3E50;
+    padding: 20px;
+    border-radius: 5px;
+}
+.chart canvas {
+    width: 100%;
+}
+.disabled {
+    opacity: 0.3 !important;
+    cursor: not-allowed !important;
+}
+/* finished css Reports */
+
+/* Awal Calendar */
+.calendar-plan {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.calendar-section {
+    display: flex;
+    gap: 20px;
+    margin-left: 100px;
+}
+
+.calendar {
+    background-color: #334155;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+    margin-left: 150px;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    background-color: #1f2937
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    text-align: center;
+}
+
+.day-header {
+    font-weight: bold;
+    color: #9ca3af;
+    padding: 5px;
+}
+
+.day {
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+}
+
+.day:hover {
+    background-color: #374151;
+}
+
+.weekend {
+    color: #ef4444;
+}
+
+.session-panel {
+    background-color: #111827;
+    padding: 20px;
+    border-radius: 8px;
+    width: 250px;
+}
+
+.session-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.session-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.session-type {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+}
+
+.session-type:hover {
+    background-color: #374151;
+}
+
+.session-indicator {
+    width: 3px;
+    height: 20px;
+    border-radius: 2px;
+}
+
+.selected-session {
+    outline: 2px solid white;
+    outline-offset: 2px;
+}
+
+.add-session-btn {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.add-session-btn:hover {
+    background-color: #2563eb;
+}
+
+.session-form {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #374151;
+    border-radius: 4px;
+}
+
+.session-form input {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+    border: none;
+    border-radius: 4px;
+    background-color: #1f2937;
+    color: white;
+}
+
+.session-form input[type="color"] {
+    height: 40px;
+    padding: 0;
+    background: none;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.form-buttons button {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.save-btn {
+    background-color: #10b981;
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #ef4444;
+    color: white;
+}
+
+.delete-btn {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    position: absolute;
+    right: 8px;
+    display: none;
+}
+
+.session-type:hover .delete-btn {
+    display: block;
+}
+
+/* Styling for dates with sessions */
+.day.has-session {
+    color: white;
+}
+/* Finish Calendar */
+
+/* Begin CSS Projects */
+#projectsView {
+    /* display: flex; */
+    /* flex-direction: column; */
+    padding: 20px;
+    margin-left: 250px;
+    /* height: calc(100vh - 40px); */
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+h1 {
+    font-size: 2em;
+    margin-bottom: 0;
+}
+h2 {
+    font-size: 1.5em;
+    margin-top: 0;
+}
+table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background-color: #34495E;
+    border-radius: 10px;
+    overflow: hidden;
+}
+th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #2C3E50;
+}
+th {
+    background-color: #8E44AD;
+    color: white;
+}
+td {
+    color: white;
+}
+.add-project-btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #8E44AD;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1em;
+    cursor: pointer;
+}
+.add-project-btn:hover {
+    background-color: #732D91;
+}
+.input-container {
+    margin: 20px auto;
+    width: 80%;
+    text-align: left;
+    
+}
+.input-container input {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin: 5px 0;
+    border: none;
+    border-radius: 5px;
+    background-color: white;
+    color: black;
+}
+
+.delete-btn {
+    background-color: #E74C3C;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+.delete-btn:hover {
+    background-color: #C0392B;
+}
