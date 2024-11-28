@@ -32,7 +32,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadTasksFromLocalStorage(storageKey, tableSelector) {
         const tasks = JSON.parse(localStorage.getItem(storageKey) || '[]');
         const tableBody = document.querySelector(tableSelector);
-        tableBody.innerHTML = ''; // Bersihkan tabel sebelum memuat
+        console.log(tableBody);
+        if (tableBody) {
+            tableBody.innerHTML = ''; // Bersihkan tabel sebelum memuat
 
         tasks.forEach(task => {
             const newRow = document.createElement('tr');
@@ -82,10 +84,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             tableBody.appendChild(newRow);
         });
+        }
     }
 
     function initializeDayView() {
         const addButton = document.querySelector('#dayView #addButton');
+        console.log(addButton);
         if (addButton) {
             addButton.addEventListener('click', addDayTask);
         }
@@ -174,6 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function initializeAssignmentView() {
         const addAssignmentButton = document.querySelector('#assignmentView #addAssignmentButton');
+        console.log(addAssignmentButton);
         if (addAssignmentButton) {
             addAssignmentButton.addEventListener('click', addAssignmentTask);
         }
@@ -262,6 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function initializeEventView() {
         const addEventButton = document.querySelector('#eventView #addEventButton');
+        console.log(addEventButton);
         if (addEventButton) {
             addEventButton.addEventListener('click', addEventTask);
         }
