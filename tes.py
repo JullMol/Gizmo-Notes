@@ -60,4 +60,4 @@ async def on_ready():
     start_flask.start()
 
 # Jalankan bot
-bot.run(os.getenv('BOT_TOKEN'))
+bot.run('MTMxMTI1MTY1NDM4MDc0ODg3MQ.GkjbLb.hlqELTb8d7TKQqBXTRUIXw9FuvLwjsQpl2K2mg')
