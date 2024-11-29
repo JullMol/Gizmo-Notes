@@ -76,16 +76,9 @@ def dc():
         'phone': data['phone'],
         'role': data['role']
     }
-    print(member_data)
 
-    members.inviteend(member_data)  # Menambahkan ke list members
-
+    members.append(member_data)  # Menambahkan ke list members
+    print(members)
     return jsonify({'message': 'Member added successfully!'}), 201
-
-@invite.route('/members', methods=['GET'])
-def get_members():
-    # Mengembalikan semua data anggota yang disimpan di memori
-    return jsonify(members)
-
 if __name__ == '__main__':
     invite.run(debug=True)

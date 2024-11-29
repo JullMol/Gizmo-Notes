@@ -38,21 +38,31 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.removeItem('members'); // Menghapus data members di localStorage
     });
 
-    // Ambil data dari localStorage jika ada untuk menampilkan data yang sudah ada
-    const members = JSON.parse(localStorage.getItem('members')) || [];
+    // Ambil data anggota dari backend (Flask)
+    fetch('/members')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Menambahkan data anggota ke dalam tabel
+            data.forEach(member => {
+                const newRow = tbody.insertRow();
+                const nameCell = newRow.insertCell(0);
+                const emailCell = newRow.insertCell(1);
+                const phoneCell = newRow.insertCell(2);
+                const roleCell = newRow.insertCell(3);
 
-    // Jika ada data, tampilkan di tabel
-    members.forEach(member => {
-        const newRow = tbody.insertRow();
-
-        const nameCell = newRow.insertCell(0);
-        const emailCell = newRow.insertCell(1);
-        const phoneCell = newRow.insertCell(2);
-        const roleCell = newRow.insertCell(3);  // Kolom Role
-
-        nameCell.textContent = member.name;
-        emailCell.textContent = member.email;
-        phoneCell.textContent = member.phone;
-        roleCell.textContent = member.role;  // Tampilkan Role
-    });
+                nameCell.textContent = member.name;
+                emailCell.textContent = member.email;
+                phoneCell.textContent = member.phone;
+                roleCell.textContent = member.role;
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching members:', error);
+            alert('There was an error fetching the members.');
+        });
 })

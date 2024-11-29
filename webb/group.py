@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Blueprint, jsonify
+from flask import Flask, render_template, Blueprint, jsonify, request
 import requests
 from dotenv import load_dotenv
 import os
@@ -9,6 +9,8 @@ DISCORD_API_BASE_URL = os.getenv("DISCORD_API_BASE_URL")
 CHANNEL_ID = os.getenv("CHANNEL_ID")
 
 group = Blueprint('group', __name__)
+
+members = []
 
 @group.route('/')
 def index():
@@ -66,6 +68,10 @@ def Calendar():
 def invite():
     return render_template('Invite.html')
 
+@group.route('/invite', methods=['POST'])
+def get_members():
+    return jsonify(members)  # Mengembalikan data anggota yang ada di memori
+
 @group.route('/api/hello', methods=['GET'])
 def api_hello():
     return jsonify({"message": "Hello from Flask!"})
@@ -75,7 +81,7 @@ def invite_bot():
     url = f"{DISCORD_API_BASE_URL}/channels/{CHANNEL_ID}/invites"
     headers = {
         "Authorization": f"Bot {DISCORD_BOT_TOKEN}",
-        "Content-Type": "application/json"
+        "Content-Type": "grouplication/json"
     }
     payload = {
         "max_age": 3600,  # Link valid selama 1 jam
@@ -92,4 +98,4 @@ def invite_bot():
         return jsonify({"error": "Failed to generate invite"}), 500
 
 if __name__ == '__main__':
-    group.run(debug=True)
+    group.run(debug=True, port=5002)
