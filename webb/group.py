@@ -11,6 +11,7 @@ CHANNEL_ID = os.getenv("CHANNEL_ID")
 group = Blueprint('group', __name__)
 
 members = []
+schedules = []
 
 @group.route('/')
 def index():
@@ -87,6 +88,24 @@ def get_members_from_invite():
     except requests.exceptions.RequestException as e:
         print("Error saat melakukan request:", str(e))
         return jsonify({"error": str(e)}), 500
+    
+@group.route('/api/add_schedule', methods=['POST'])
+def add_schedule():
+    try:
+        # Ambil data schedule dari request
+        schedule_data = request.json
+        
+        # Tambahkan schedule ke list
+        schedules.append(schedule_data)
+        
+        # Kembalikan respons sukses
+        return jsonify({"message": "Schedule added successfully", "schedules": schedules}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@group.route('/api/get_schedules', methods=['GET'])
+def get_schedules():
+    return jsonify(schedules)
 
 @group.route('/api/hello', methods=['GET'])
 def api_hello():

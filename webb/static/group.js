@@ -2,8 +2,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const groupProjectView = document.getElementById('groupProjectView');
     const groupProjectLink = document.getElementById('groupProjectLink');
     const membersTable = document.getElementById('membersTable');
+    const scheduleTable = document.getElementById('scheduleTable')
     const tbody = membersTable.querySelector('tbody');
+    const tbody1 = scheduleTable.querySelector('tbody');
     const addRowBtn = document.querySelector('.add-row-btn'); // Tombol Add
+    const addSchBtn = document.querySelector('.add-sch-btn');
+    
 
     function showView(viewToShow) {
         groupProjectView.style.display = 'none';
@@ -32,6 +36,19 @@ document.addEventListener('DOMContentLoaded', function() {
         // Tambahkan input untuk Role
         roleCell.innerHTML = '<select><option value="Admin">Admin</option><option value="Member">Member</option><option value="Guest">Guest</option></select>';
     });
+
+    addSchBtn.addEventListener('click', function() {
+        const newRow1 = tbody1.insertRow();  // Menambahkan baris baru ke tabel
+
+        const dateCell = newRow1.insertCell(0);
+        const subjectCell = newRow1.insertCell(1);
+        const linkCell = newRow1.insertCell(2);
+
+        dateCell.innerHTML = '<input type="date">';
+        subjectCell.innerHTML = '<input type="text" placeholder="Enter subject">';
+        linkCell.innerHTML = '<input type="url" placeholder="Enter link">';
+        let isValid = true;
+    })
 
     // Hapus data dari localStorage saat halaman akan ditutup atau direfresh
     window.addEventListener('beforeunload', function () {
@@ -65,4 +82,35 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error fetching members:', error);
             alert('There was an error fetching the members.');
         });
+
+    if (isValid) {
+        const scheduleData = {
+            date: dateCell,
+            subject: subjectCell,
+            link: linkCell
+        };
+        console.log('Schedule Data:', scheduleData)
+
+        fetch('/api/add_schedule', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(scheduleData)
+        })
+        .then(response => {
+            if (!response.ok) { // Jika status bukan 2xx, maka ada error
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message);  // Menampilkan pesan sukses dari backend
+            resetForm();  // Reset form setelah sukses
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('There was an error adding the member.');
+        });
+    }
 })
