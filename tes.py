@@ -8,6 +8,7 @@ import os
 
 FLASK_SERVER_URL = os.getenv("FLASK_SERVER_URL")
 FLASK_API_URL = os.getenv('FLASK_API_URL')
+BOT_TOKEN = os.getenv('BOT_TOKEN')
 
 # Flask App
 app = Flask(__name__)
@@ -60,4 +61,4 @@ async def on_ready():
     start_flask.start()
 
 # Jalankan bot
-bot.run(os.getenv('BOT_TOKEN'))
+bot.run(BOT_TOKEN)
