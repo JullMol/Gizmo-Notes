@@ -68,9 +68,25 @@ def Calendar():
 def invite():
     return render_template('Invite.html')
 
-@group.route('/members', methods=['POST'])
-def get_members():
-    return jsonify(members)  # Mengembalikan data anggota yang ada di memori
+@group.route('/members', methods=['GET'])
+def get_members_from_invite():
+    try:
+        # Mengambil data anggota dari API invite.py
+        response = requests.get('http://localhost:5000/api/members')  # Gantilah URL jika perlu
+        if response.status_code == 200:
+            members = response.json()  # Data anggota yang diterima dalam bentuk JSON
+            
+            # Cetak data anggota ke terminal
+            print("Data Anggota:", members)  # Menampilkan data anggota di terminal
+
+            # Kembalikan data anggota sebagai JSON (optional, jika ingin mengirim ke frontend)
+            return jsonify(members)
+        else:
+            print("Gagal mengambil data anggota. Status:", response.status_code)
+            return jsonify({"error": "Failed to fetch members"}), 500
+    except requests.exceptions.RequestException as e:
+        print("Error saat melakukan request:", str(e))
+        return jsonify({"error": str(e)}), 500
 
 @group.route('/api/hello', methods=['GET'])
 def api_hello():

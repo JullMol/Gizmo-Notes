@@ -60,6 +60,10 @@ def Calendar():
 def discord():
     return render_template('Invite.html')
 
+@invite.route('/api/members', methods=['GET'])
+def get_members():
+    return jsonify(members)
+
 @invite.route('/invite', methods=['POST'])
 def dc():
     # Menerima data JSON yang dikirim oleh invite.js

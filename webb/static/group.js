@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Ambil data anggota dari backend (Flask)
-    fetch('/members')
+    fetch('/api/members')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
