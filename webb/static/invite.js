@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const inviteMembersLink = document.getElementById('inviteMembersLink');
     const modalInviteBtn = document.querySelector('.modal-invite-btn');
     const successMessage = document.getElementById('successMessage');
-    const groupProjectTable = document.querySelector('#groupProjectView table');
 
     function openModal() {
         const modalOverlay = document.getElementById('modalOverlay');
@@ -34,20 +33,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Event listener untuk tombol Add
     document.querySelectorAll('.add-btn').forEach(button => {
-        button.addEventListener('click', function() {
+        modalInviteBtn.addEventListener('click', function() {
             addNewRow(this);
         });
     });
-
-    // Function to validate email
-    function isValidEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-
-    // Function to validate phone number
-    function isValidPhone(phone) {
-        return /^\+?[\d\s-]{10,}$/.test(phone);
-    }
 
     // Function to show error
     function showError(inputId, errorId, show) {
@@ -62,18 +51,43 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Function to add member to table
-    function addMemberToTable(name, email, phone) {
-        const newRow = groupProjectTable.insertRow(-1);
-        
-        const nameCell = newRow.insertCell(0);
-        const emailCell = newRow.insertCell(1);
-        const phoneCell = newRow.insertCell(2);
+     // Handle invite button click
+     modalInviteBtn.addEventListener('click', function() {
+        const name = document.getElementById('memberName').value.trim();
+        const email = document.getElementById('memberEmail').value.trim();
+        const phone = document.getElementById('memberPhone').value.trim();
+        const role = document.getElementById('workspaceRole').value;
 
-        nameCell.textContent = name;
-        emailCell.textContent = email;
-        phoneCell.textContent = phone;
-    }
+        let isValid = true;
+
+        // Validasi input
+        if (!name || !email || !phone || !role) {
+            alert('Please fill all fields');
+            isValid = false;
+        }
+
+        if (isValid) {
+            // Ambil data dari localStorage atau buat array baru
+            const members = JSON.parse(localStorage.getItem('members')) || [];
+
+            // Cek apakah data sudah ada
+            const isDuplicate = members.some(member => member.name === name && member.email === email && member.phone === phone);
+
+            if (isDuplicate) {
+                alert('This member is already added!');
+                return;
+            }
+
+            // Tambahkan data baru ke array
+            members.push({ name, email, phone, role });
+
+            // Simpan kembali ke localStorage
+            localStorage.setItem('members', JSON.stringify(members));
+
+            alert('Member added successfully!');
+            resetForm();
+        }
+    });
 
     // Function to show success message
     function showSuccessMessage() {
@@ -81,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             successMessage.style.display = 'none';
         }, 3000);
-    }
+    };
 
     // Reset form function
     function resetForm() {
@@ -94,57 +108,5 @@ document.addEventListener('DOMContentLoaded', function() {
         showError('memberName', 'nameError', false);
         showError('memberEmail', 'emailError', false);
         showError('memberPhone', 'phoneError', false);
-    }
-
-    // Handle invite button click
-    modalInviteBtn.addEventListener('click', function() {
-        console.log('Invite Clicked')
-        const name = document.getElementById('memberName').value.trim();
-        const email = document.getElementById('memberEmail').value.trim();
-        const phone = document.getElementById('memberPhone').value.trim();
-        const role = document.getElementById('workspaceRole').value;
-
-        let isValid = true;
-
-        // Validate name
-        if (!name) {
-            showError('memberName', 'nameError', true);
-            isValid = false;
-        } else {
-            showError('memberName', 'nameError', false);
-        }
-
-        // Validate email
-        if (!email || !isValidEmail(email)) {
-            showError('memberEmail', 'emailError', true);
-            isValid = false;
-        } else {
-            showError('memberEmail', 'emailError', false);
-        }
-
-        // Validate phone
-        if (!phone || !isValidPhone(phone)) {
-            showError('memberPhone', 'phoneError', true);
-            isValid = false;
-        } else {
-            showError('memberPhone', 'phoneError', false);
-        }
-
-        if (!role) {
-            alert('Please select a role');
-            isValid = false;
-        }
-
-        if (isValid) {
-            // Add member to table
-            addMemberToTable(name, email, phone);
-            
-            // Show success message
-            showSuccessMessage();
-            
-            // Close modal and reset form
-        modalOverlay.classList.remove('active');
-        resetForm();
-        }
-    });
-})
+    };
+});

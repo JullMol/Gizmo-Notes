@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     const groupProjectView = document.getElementById('groupProjectView');
     const groupProjectLink = document.getElementById('groupProjectLink');
+    const membersTable = document.getElementById('membersTable');
+    const tbody = membersTable.querySelector('tbody');
+    const addRowBtn = document.querySelector('.add-row-btn'); // Tombol Add
 
     function showView(viewToShow) {
         groupProjectView.style.display = 'none';
@@ -12,45 +15,44 @@ document.addEventListener('DOMContentLoaded', function() {
         showView(groupProjectView);
     });
 
-    // Add row functionality for tables
-    window.addRow = function(tableId) {
-        const table = document.getElementById(tableId);
-        const tbody = table.querySelector('tbody');
-        const firstRow = tbody.querySelector('tr');
-        const newRow = firstRow.cloneNode(true);
-        
-        // Clear input values in the new row
-        newRow.querySelectorAll('input').forEach(input => {
-            input.value = '';
-        });
-        
-        tbody.appendChild(newRow);
-    };
+    // Fungsi untuk menambahkan baris kosong dengan inputan kosong (termasuk Role)
+    addRowBtn.addEventListener('click', function() {
+        const newRow = tbody.insertRow();  // Menambahkan baris baru ke tabel
 
-    function addRow(tableId) {
-        const table = document.getElementById(tableId);
-        const tbody = table.querySelector('tbody');
-        const firstRow = tbody.querySelector('tr');
-        const newRow = firstRow.cloneNode(true);
-        
-        // Clear input values in the new row
-        newRow.querySelectorAll('input').forEach(input => {
-            input.value = '';
-        });
-        
-        tbody.appendChild(newRow);
-    }
+        // Menambahkan kolom inputan kosong untuk setiap kolom
+        const nameCell = newRow.insertCell(0);
+        const emailCell = newRow.insertCell(1);
+        const phoneCell = newRow.insertCell(2);
+        const roleCell = newRow.insertCell(3);  // Menambahkan kolom untuk Role
 
-    function addNewRow(button) {
-        const previousRow = button.previousElementSibling;
-        const newRow = previousRow.cloneNode(true);
+        nameCell.innerHTML = '<input type="text" placeholder="Enter name">';
+        emailCell.innerHTML = '<input type="email" placeholder="Enter email">';
+        phoneCell.innerHTML = '<input type="tel" placeholder="Enter phone">';
         
-        // Clear semua input dalam row baru
-        newRow.querySelectorAll('input').forEach(input => {
-            input.value = '';
-        });
-        
-        // Insert row baru sebelum tombol
-        button.parentNode.insertBefore(newRow, button);
-    }
+        // Tambahkan input untuk Role
+        roleCell.innerHTML = '<select><option value="Admin">Admin</option><option value="Member">Member</option><option value="Guest">Guest</option></select>';
+    });
+
+    // Hapus data dari localStorage saat halaman akan ditutup atau direfresh
+    window.addEventListener('beforeunload', function () {
+        localStorage.removeItem('members'); // Menghapus data members di localStorage
+    });
+
+    // Ambil data dari localStorage jika ada untuk menampilkan data yang sudah ada
+    const members = JSON.parse(localStorage.getItem('members')) || [];
+
+    // Jika ada data, tampilkan di tabel
+    members.forEach(member => {
+        const newRow = tbody.insertRow();
+
+        const nameCell = newRow.insertCell(0);
+        const emailCell = newRow.insertCell(1);
+        const phoneCell = newRow.insertCell(2);
+        const roleCell = newRow.insertCell(3);  // Kolom Role
+
+        nameCell.textContent = member.name;
+        emailCell.textContent = member.email;
+        phoneCell.textContent = member.phone;
+        roleCell.textContent = member.role;  // Tampilkan Role
+    });
 })
