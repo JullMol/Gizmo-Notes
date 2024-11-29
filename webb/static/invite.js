@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const name = document.getElementById('memberName').value.trim();
         const email = document.getElementById('memberEmail').value.trim();
         const phone = document.getElementById('memberPhone').value.trim();
-        const role = document.getElementById('workspaceRole').value;
+        const role = document.getElementById('workspaceRole').value.trim();  // Ambil role
 
         let isValid = true;
 
@@ -67,25 +67,35 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (isValid) {
-            // Ambil data dari localStorage atau buat array baru
-            const members = JSON.parse(localStorage.getItem('members')) || [];
+            const memberData = {
+                name: name,
+                email: email,
+                phone: phone,
+                role: role
+            };
 
-            // Cek apakah data sudah ada
-            const isDuplicate = members.some(member => member.name === name && member.email === email && member.phone === phone);
-
-            if (isDuplicate) {
-                alert('This member is already added!');
-                return;
-            }
-
-            // Tambahkan data baru ke array
-            members.push({ name, email, phone, role });
-
-            // Simpan kembali ke localStorage
-            localStorage.setItem('members', JSON.stringify(members));
-
-            alert('Member added successfully!');
-            resetForm();
+            // Kirim data ke server menggunakan Fetch API
+            fetch('/invite', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(memberData)
+            })
+            .then(response => {
+                if (!response.ok) { // Jika status bukan 2xx, maka ada error
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);  // Menampilkan pesan sukses dari backend
+                resetForm();  // Reset form setelah sukses
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('There was an error adding the member.');
+            });
         }
     });
 
