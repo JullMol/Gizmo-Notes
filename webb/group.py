@@ -68,7 +68,7 @@ def Calendar():
 def invite():
     return render_template('Invite.html')
 
-@group.route('/invite', methods=['POST'])
+@group.route('/members', methods=['POST'])
 def get_members():
     return jsonify(members)  # Mengembalikan data anggota yang ada di memori
 

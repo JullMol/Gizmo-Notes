@@ -73,7 +73,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 phone: phone,
                 role: role
             };
-
+            console.log('Member Data:', memberData)
+            
             // Kirim data ke server menggunakan Fetch API
             fetch('/invite', {
                 method: 'POST',
