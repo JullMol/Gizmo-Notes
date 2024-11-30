@@ -117,10 +117,11 @@ async def ping(ctx):
         "3. !add_gp <category_name> <channel_name> : Add channel to category\n"
         "4. !role : View role\n"
         "5. !pick_role <role_name> : Select role\n"
-        "6. !add_meet <category _name> <voice_channel_name> : Create voice channel\n"
-        "7. !record <channel_name> <voice_channel_name> : Record activity\n"
-        "8. !get_record : Request the recording result\n"
-        "9. !end_gp : <category_name> : Delete category"
+        "6. !change_role <@Username> <role_name> : Change role other member if you are Admin\n"
+        "7. !add_meet <category _name> <voice_channel_name> : Create voice channel\n"
+        "8. !record <channel_name> <voice_channel_name> : Record activity\n"
+        "9. !get_record : Request the recording result\n"
+        "10. !end_gp : <category_name> : Delete category"
     )
     
 @bot.command()
@@ -272,6 +273,42 @@ async def pick_role(ctx, *, role_name: str):
         await ctx.send(f"Role Anda telah diperbarui menjadi **{role_name}**!")
     except discord.Forbidden:
         await ctx.send("Saya tidak memiliki izin untuk mengubah role Anda!")
+    except discord.HTTPException as e:
+        await ctx.send(f"Terjadi kesalahan: {e}")
+
+@bot.command()
+@commands.has_role("Admin")  # Hanya bisa dijalankan oleh user dengan role "Admin"
+async def change_role(ctx, member: discord.Member, *, role_name: str):
+    """Mengubah role anggota lain. Hanya untuk Admin."""
+    guild = ctx.guild
+
+    # Daftar role yang diizinkan
+    allowed_roles = ["Admin", "Member", "Guest"]
+
+    # Validasi role
+    role = discord.utils.get(guild.roles, name=role_name)
+    if not role or role_name not in allowed_roles:
+        await ctx.send(f"Role **{role_name}** tidak valid! Role yang tersedia: {', '.join(allowed_roles)}")
+        return
+
+    # Periksa apakah member sudah memiliki role tersebut
+    if role in member.roles:
+        await ctx.send(f"Anggota **{member.display_name}** sudah memiliki role **{role_name}**!")
+        return
+
+    # Hapus role lama (jika ada) sebelum menambahkan role baru
+    roles_to_remove = [r for r in member.roles if r.name in allowed_roles]
+
+    try:
+        # Hapus role lama
+        for old_role in roles_to_remove:
+            await member.remove_roles(old_role)
+
+        # Tambahkan role baru
+        await member.add_roles(role)
+        await ctx.send(f"Role anggota **{member.display_name}** telah diubah menjadi **{role_name}** oleh **{ctx.author.display_name}**.")
+    except discord.Forbidden:
+        await ctx.send("Saya tidak memiliki izin untuk mengubah role anggota ini!")
     except discord.HTTPException as e:
         await ctx.send(f"Terjadi kesalahan: {e}")
         
