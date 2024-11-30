@@ -107,30 +107,5 @@ def add_schedule():
 def get_schedules():
     return jsonify(schedules)
 
-@group.route('/api/hello', methods=['GET'])
-def api_hello():
-    return jsonify({"message": "Hello from Flask!"})
-
-@group.route('/invite-bot', methods=['GET'])
-def invite_bot():
-    url = f"{DISCORD_API_BASE_URL}/channels/{CHANNEL_ID}/invites"
-    headers = {
-        "Authorization": f"Bot {DISCORD_BOT_TOKEN}",
-        "Content-Type": "grouplication/json"
-    }
-    payload = {
-        "max_age": 3600,  # Link valid selama 1 jam
-        "max_uses": 1,    # Maksimum 1 pengguna
-        "temporary": False,
-        "unique": True
-    }
-
-    response = requests.post(url, headers=headers, json=payload)
-    if response.status_code == 200:
-        invite = response.json()
-        return jsonify({"invite_link": f"https://discord.gg/{invite['code']}"})
-    else:
-        return jsonify({"error": "Failed to generate invite"}), 500
-
 if __name__ == '__main__':
     group.run(debug=True, port=5002)
