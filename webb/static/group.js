@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const addRowBtn = document.querySelector('.add-row-btn'); // Tombol Add
     const addSchBtn = document.querySelector('.add-sch-btn');
     
-
     function showView(viewToShow) {
         groupProjectView.style.display = 'none';
         viewToShow.style.display = 'block';
@@ -47,8 +46,58 @@ document.addEventListener('DOMContentLoaded', function() {
         dateCell.innerHTML = '<input type="date">';
         subjectCell.innerHTML = '<input type="text" placeholder="Enter subject">';
         linkCell.innerHTML = '<input type="url" placeholder="Enter link">';
+
+        // Tambahkan event listener untuk deteksi input "!bot"
+        linkCell.querySelector('input').addEventListener('input', function(event) {
+            const input = event.target.value;
+
+            if (input === '!bot') {
+                fetch('/api/bot_invite')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch bot invite link');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Ubah nilai input menjadi tautan bot
+                        event.target.value = data.invite_link;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching bot invite link:', error);
+                        alert('Error fetching bot invite link.');
+                    });
+            }
+        });
         let isValid = true;
     })
+
+    // Tambahkan event listener pada input kolom link
+    tbody1.addEventListener('input', function(event) {
+        const target = event.target;
+
+        // Periksa apakah input di kolom link
+        if (target.tagName === 'INPUT' && target.type === 'url') {
+            // Periksa jika input adalah "!bot"
+            if (target.value === '!bot') {
+                fetch('/api/bot_invite')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Ganti nilai input dengan tautan dari backend
+                        target.value = data.invite_link;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching bot invite link:', error);
+                        alert('Failed to fetch the bot invite link.');
+                    });
+            }
+        }
+    });
 
     // Hapus data dari localStorage saat halaman akan ditutup atau direfresh
     window.addEventListener('beforeunload', function () {

@@ -107,5 +107,10 @@ def add_schedule():
 def get_schedules():
     return jsonify(schedules)
 
+@group.route('/api/bot_invite', methods=['GET'])
+def bot_invite():
+    invite_link = "https://discord.gg/CC8Q36Su"
+    return jsonify({"invite_link": invite_link}), 200
+
 if __name__ == '__main__':
     group.run(debug=True, port=5002)

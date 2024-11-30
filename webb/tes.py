@@ -42,6 +42,11 @@ admins = {}
 roles = {}
 emails = {}
 
+@app.route('/api/bot_invite', methods=['GET'])
+def bot_invite():
+    invite_link = personal_bot
+    return {"invite_link": invite_link}, 200
+
 @bot.event
 async def on_ready():
     global flask_thread_started
