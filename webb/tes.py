@@ -48,6 +48,51 @@ def bot_invite():
     return {"invite_link": invite_link}, 200
 
 @bot.event
+async def on_member_update(before, after):
+    guild = after.guild
+    channel_name = "bot_testing"  # Ganti dengan nama channel yang ingin Anda bersihkan
+
+    # Temukan channel bot_testing
+    channel = discord.utils.get(guild.text_channels, name=channel_name)
+    if not channel:
+        print(f"Channel **{channel_name}** tidak ditemukan!")
+        return
+
+    # Bersihkan semua pesan di channel
+    try:
+        await channel.purge()
+        print(f"Pesan di channel **{channel_name}** telah dihapus.")
+    except discord.Forbidden:
+        print("Bot tidak memiliki izin untuk menghapus pesan.")
+    except discord.HTTPException as e:
+        print(f"Terjadi kesalahan saat menghapus pesan: {e}")
+
+@bot.command()
+async def clear(ctx):
+    await ctx.channel.purge()
+    await ctx.send("Channel telah dibersihkan!")
+
+@bot.event
+async def on_member_join(member):
+    guild = member.guild
+    channel_name = "bot_testing"  # Ganti dengan nama channel yang ingin Anda bersihkan
+
+    # Temukan channel bot_testing
+    channel = discord.utils.get(guild.text_channels, name=channel_name)
+    if not channel:
+        print(f"Channel **{channel_name}** tidak ditemukan!")
+        return
+
+    # Bersihkan semua pesan di channel
+    try:
+        await channel.purge()
+        await channel.send(f"Selamat datang di server, {member.mention}! Channel telah dibersihkan.")
+    except discord.Forbidden:
+        print("Bot tidak memiliki izin untuk menghapus pesan.")
+    except discord.HTTPException as e:
+        print(f"Terjadi kesalahan saat menghapus pesan: {e}")
+
+@bot.event
 async def on_ready():
     global flask_thread_started
     print(f"Bot {bot.user} is ready!")
@@ -75,7 +120,7 @@ async def ping(ctx):
         "6. !add_meet <category _name> <voice_channel_name> : Create voice channel\n"
         "7. !record <channel_name> <voice_channel_name> : Record activity\n"
         "8. !get_record : Request the recording result\n"
-        "9. !end_gp : Delete category"
+        "9. !end_gp : <category_name> : Delete category"
     )
     
 @bot.command()
@@ -179,6 +224,56 @@ async def link(ctx, *, category_name: str):
         )
     else:
         await ctx.send(f"Category with named **{category.name}** not have channel!")
+        
+@bot.command()
+async def role(ctx):
+    guild = ctx.guild
+
+    # Daftar role yang akan ditampilkan
+    role_names = ["Admin", "Member", "Guest"]
+
+    # Periksa apakah role-role tersebut ada di server
+    available_roles = [role.name for role in guild.roles if role.name in role_names]
+    if not available_roles:
+        await ctx.send("Tidak ada role yang tersedia di server ini!")
+        return
+
+    # Kirim daftar role ke user
+    await ctx.send(f"Role yang tersedia: {', '.join(available_roles)}")
+
+
+@bot.command()
+async def pick_role(ctx, *, role_name: str):
+    guild = ctx.guild
+    member = ctx.author
+
+    # Periksa apakah role ada di server
+    role = discord.utils.get(guild.roles, name=role_name)
+    if not role:
+        await ctx.send(f"Role **{role_name}** tidak ditemukan! Gunakan `!role` untuk melihat daftar role yang tersedia.")
+        return
+
+    # Periksa apakah user sudah memiliki role tersebut
+    if role in member.roles:
+        await ctx.send(f"Anda sudah memiliki role **{role_name}**!")
+        return
+
+    # Hapus role lain sebelum menambahkan role baru
+    role_names = ["Admin", "Member", "Guest"]
+    roles_to_remove = [r for r in member.roles if r.name in role_names]
+
+    try:
+        # Hapus role-role lama
+        for old_role in roles_to_remove:
+            await member.remove_roles(old_role)
+
+        # Tambahkan role baru
+        await member.add_roles(role)
+        await ctx.send(f"Role Anda telah diperbarui menjadi **{role_name}**!")
+    except discord.Forbidden:
+        await ctx.send("Saya tidak memiliki izin untuk mengubah role Anda!")
+    except discord.HTTPException as e:
+        await ctx.send(f"Terjadi kesalahan: {e}")
         
 @bot.command()
 async def add_meet(ctx, category_name: str, *, voice_channel_name: str):
