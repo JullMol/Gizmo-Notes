@@ -27,13 +27,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const emailCell = newRow.insertCell(1);
         const phoneCell = newRow.insertCell(2);
         const roleCell = newRow.insertCell(3);  // Menambahkan kolom untuk Role
+        const actionCell = newRow.insertCell(4);
 
         nameCell.innerHTML = '<input type="text" placeholder="Enter name">';
         emailCell.innerHTML = '<input type="email" placeholder="Enter email">';
         phoneCell.innerHTML = '<input type="tel" placeholder="Enter phone">';
-        
-        // Tambahkan input untuk Role
         roleCell.innerHTML = '<select><option value="Admin">Admin</option><option value="Member">Member</option><option value="Guest">Guest</option></select>';
+    
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', function () {
+            newRow.remove(); // Hapus baris dari tabel
+        });
+        actionCell.appendChild(deleteButton);
     });
 
     addSchBtn.addEventListener('click', function() {
@@ -42,12 +48,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const dateCell = newRow1.insertCell(0);
         const subjectCell = newRow1.insertCell(1);
         const linkCell = newRow1.insertCell(2);
+        const actionCell = newRow1.insertCell(3);
 
         dateCell.innerHTML = '<input type="date">';
         subjectCell.innerHTML = '<input type="text" placeholder="Enter subject">';
         linkCell.innerHTML = '<input type="url" placeholder="Enter link">';
-
-        // Tambahkan event listener untuk deteksi input "!bot"
         linkCell.querySelector('input').addEventListener('input', function(event) {
             const input = event.target.value;
 
@@ -70,6 +75,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         let isValid = true;
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', function () {
+            newRow1.remove(); // Hapus baris dari tabel
+        });
+        actionCell.appendChild(deleteButton);
     })
 
     // Tambahkan event listener pada input kolom link
@@ -105,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Ambil data anggota dari backend (Flask)
-    fetch('/api/members')
+        fetch('/api/members')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -120,11 +131,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 const emailCell = newRow.insertCell(1);
                 const phoneCell = newRow.insertCell(2);
                 const roleCell = newRow.insertCell(3);
+                const actionCell = newRow.insertCell(4);
 
                 nameCell.textContent = member.name;
                 emailCell.textContent = member.email;
                 phoneCell.textContent = member.phone;
                 roleCell.textContent = member.role;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.addEventListener('click', function () {
+                    fetch(`/api/members/${member.id}`, { method: 'DELETE' })
+                        .then(response => {
+                            if (!response.ok) throw new Error('Failed to delete member');
+                            newRow.remove();
+                            alert('Member deleted successfully');
+                        })
+                        .catch(error => {
+                            console.error('Error deleting member:', error);
+                            alert('Failed to delete member.');
+                        });
+                });
+                actionCell.appendChild(deleteButton);
             });
         })
         .catch(error => {
