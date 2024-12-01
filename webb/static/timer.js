@@ -5,10 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const timeDisplay = document.querySelector('.time span');
     const playButton = document.querySelector('.play-button');
     const resetButton = document.querySelector('.reset-timer');
-    const createGoals = document.querySelector('.create-goals');
-    const goalsContent = document.querySelector('.goals-content');
-    const goalsTextarea = document.querySelector('.goals-textarea');
-    const saveGoalsButton = document.querySelector('.goals-save');
+    const createGoals = document.getElementById('page-goals');
     const timeManagementTableBody = document.querySelector('.time-management-table-body');
     const taskInput = document.querySelector('.task-input');
     populateHours('.hour-start');
@@ -20,8 +17,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const datePicker = document.querySelector('.date-picker');
     const calendarMonthYear = document.querySelector('.calendar-month-year');
     const calendarGrid = document.querySelector('.calendar-grid');
-    const listViewButton = document.getElementById('listViewButton');
-    const listViewTable = document.querySelector('.list-view-table');
 
     function showView(viewToShow) {
         timerView.style.display = 'none';
@@ -34,8 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Validasi elemen yang harus ada
-    if (!timeDisplay || !playButton || !resetButton || !createGoals || !goalsContent || 
-        !goalsTextarea || !saveGoalsButton || !timeManagementTableBody || !taskInput || 
+    if (!timeDisplay || !playButton || !resetButton || !timeManagementTableBody || !taskInput || 
         !saveTimeSlotButton || !currentDate || !datePicker || !calendarMonthYear || !calendarGrid) {
         console.error('Salah satu elemen penting untuk timer atau kalender tidak ditemukan.');
         return;
@@ -51,6 +45,10 @@ document.addEventListener('DOMContentLoaded', function () {
     let breakTime = 5 * 60; // 5 menit break time
     let totalDuration = 0;
     let isBreak = false;
+
+    createGoals.addEventListener('click', function () {
+        window.location.href = '/page-goals';
+    });
 
     function fetchTasks() {
         fetch('/tasks')
@@ -500,21 +498,6 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => console.error('Error fetching tasks:', error));
     }  
-
-    // Fungsi Goals
-    createGoals.addEventListener('click', function () {
-        goalsContent.classList.toggle('active');
-    });
-
-    saveGoalsButton.addEventListener('click', function () {
-        const savedGoals = goalsTextarea.value.trim();
-        if (savedGoals) {
-            alert('Goals saved successfully!');
-            goalsTextarea.value = '';
-        } else {
-            alert('Please enter some goals.');
-        }
-    });   
 
     // Fungsi Kalender
     let selectedDate = new Date();  

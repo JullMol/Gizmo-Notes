@@ -67,7 +67,11 @@ def Calendar():
     return render_template('Calendar.html')
 
 @group.route('/Invite.html')
-def invite():
+def Vite():
+    return render_template('Invite.html')
+
+@group.route('/invite')
+def invi():
     return render_template('Invite.html')
 
 @group.route('/members', methods=['GET', 'POST'])

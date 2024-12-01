@@ -713,39 +713,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     color: #ffcc00;
     cursor: pointer;
 }
-.goals-content {
-    display: none;
-    background-color: #1b1b2f;
-    padding: 15px;
-    border-radius: 5px;
-}
-.goals-content.active {
-    display: block;
-}
-.goals-textarea {
-    width: 100%;
-    min-height: 100px;
-    background-color: #162447;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 10px;
-    resize: vertical;
-}
-.goals-save {
-    background-color: #ffcc00;
-    color: #000;
-    border: none;
-    border-radius: 5px;
-    padding: 8px 15px;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-.list-view-table, .day-view-table, .assignment-view-table, .event-view-table {
-    display: none; /* Sembunyikan semua tabel secara default */
-}
 
 .calendar {
     background-color: #1b1b2f;

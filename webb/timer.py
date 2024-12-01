@@ -69,6 +69,10 @@ def Project():
 def invite():
     return render_template('Invite.html')
 
+@timer.route('/page-goals')
+def page_goals():
+    return render_template('Goals.html')
+
 @timer.route('/add-task', methods=['POST'])
 def add_task():
     try:

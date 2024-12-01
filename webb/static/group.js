@@ -20,27 +20,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Fungsi untuk menambahkan baris kosong dengan inputan kosong (termasuk Role)
     addRowBtn.addEventListener('click', function() {
-        const newRow = tbody.insertRow();  // Menambahkan baris baru ke tabel
-
-        // Menambahkan kolom inputan kosong untuk setiap kolom
-        const nameCell = newRow.insertCell(0);
-        const emailCell = newRow.insertCell(1);
-        const phoneCell = newRow.insertCell(2);
-        const roleCell = newRow.insertCell(3);  // Menambahkan kolom untuk Role
-        const actionCell = newRow.insertCell(4);
-
-        nameCell.innerHTML = '<input type="text" placeholder="Enter name">';
-        emailCell.innerHTML = '<input type="email" placeholder="Enter email">';
-        phoneCell.innerHTML = '<input type="tel" placeholder="Enter phone">';
-        roleCell.innerHTML = '<select><option value="Admin">Admin</option><option value="Member">Member</option><option value="Guest">Guest</option></select>';
-    
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete';
-        deleteButton.addEventListener('click', function () {
-            newRow.remove(); // Hapus baris dari tabel
-        });
-        actionCell.appendChild(deleteButton);
-    });
+        window.location.href = '/invite'; // Ganti path sesuai kebutuhan
+    });    
 
     addSchBtn.addEventListener('click', function() {
         const newRow1 = tbody1.insertRow();  // Menambahkan baris baru ke tabel
