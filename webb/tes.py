@@ -4,9 +4,12 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 import asyncio
-import requests
+import requests, certifi
 from dotenv import load_dotenv
 import os
+from fpdf import FPDF
+import csv
+from datetime import datetime
 
 # Load environment variables
 load_dotenv()
@@ -41,6 +44,8 @@ flask_thread_started = False
 admins = {}
 roles = {}
 emails = {}
+recording_status = False
+recording_channel = None
 
 @app.route('/api/bot_invite', methods=['GET'])
 def bot_invite():
@@ -119,9 +124,12 @@ async def ping(ctx):
         "5. !pick_role <role_name> : Select role\n"
         "6. !change_role <@Username> <role_name> : Change role other member if you are Admin\n"
         "7. !add_meet <category _name> <voice_channel_name> : Create voice channel\n"
-        "8. !record <channel_name> <voice_channel_name> : Record activity\n"
-        "9. !get_record : Request the recording result\n"
-        "10. !end_gp : <category_name> : Delete category"
+        "8. !start_record <channel_name> : Record activity in text channel\n"
+        "9. !stop_record : Stop recording\n"
+        "10. !convert_and_upload <channel_name> : Convert csv files record to pdf and upload to AnonFiles\n"
+        "11. !get_record : Request the recording result\n"
+        "12. !end_gp : <category_name> : Delete \n"
+        "13. !clear : Clear history"
     )
     
 @bot.command()
@@ -353,6 +361,181 @@ async def add_meet(ctx, category_name: str, *, voice_channel_name: str):
     except discord.HTTPException as e:
         await ctx.send(f"Something error: {e}")
 
+@bot.command()
+async def start_record(ctx, category_name: str, *, channel_name: str):
+    guild = ctx.guild
+
+    # Format nama kategori dan channel
+    formatted_category_name = category_name.strip()
+    formatted_channel_name = channel_name.lower().replace(" ", "-")
+
+    # Temukan kategori berdasarkan nama
+    category = discord.utils.get(guild.categories, name=formatted_category_name)
+    if not category:
+        await ctx.send(f"Category with named **{formatted_category_name}** not found!")
+        return
+
+    # Tentukan nama channel default
+    default_channel_name = f"{formatted_category_name.lower().replace(' ', '-')}-projects"
+
+    # Temukan channel default dalam kategori
+    default_channel = discord.utils.get(category.text_channels, name=default_channel_name)
+
+    # Validasi: Perintah hanya dijalankan di channel default
+    if ctx.channel != default_channel:
+        await ctx.send(f"This command can only be run on the default channel **{default_channel_name}**!")
+        return
+
+    # Simpan status perekaman
+    global recording_status, recording_channel
+    recording_status = True
+    recording_channel = formatted_channel_name
+    await ctx.send(f"Recording started for channel **{formatted_channel_name}** in category **{formatted_category_name}**.")
+
+@bot.command()
+async def stop_record(ctx, category_name: str, *, channel_name: str):
+    guild = ctx.guild
+
+    # Format nama kategori dan channel
+    formatted_category_name = category_name.strip()
+    formatted_channel_name = channel_name.lower().replace(" ", "-")
+
+    # Temukan kategori berdasarkan nama
+    category = discord.utils.get(guild.categories, name=formatted_category_name)
+    if not category:
+        await ctx.send(f"Category with named **{formatted_category_name}** not found!")
+        return
+
+    # Tentukan nama channel default
+    default_channel_name = f"{formatted_category_name.lower().replace(' ', '-')}-projects"
+
+    # Temukan channel default dalam kategori
+    default_channel = discord.utils.get(category.text_channels, name=default_channel_name)
+
+    # Validasi: Perintah hanya dijalankan di channel default
+    if ctx.channel != default_channel:
+        await ctx.send(f"This command can only be run on the default channel **{default_channel_name}**!")
+        return
+
+    # Hentikan perekaman
+    global recording_status, recording_channel
+    if recording_status and recording_channel == formatted_channel_name:
+        recording_status = False
+        recording_channel = None
+        await ctx.send(f"Recording stopped for channel **{formatted_channel_name}** in category **{formatted_category_name}**.")
+    else:
+        await ctx.send("No recording is currently active.")
+
+@bot.event
+async def on_message(message):
+    """Record messages if recording is active."""
+    global recording_status, recording_channel
+
+    # Abaikan pesan dari bot itu sendiri
+    if message.author.bot:
+        return
+
+    # Rekam pesan jika perekaman aktif dan channel sesuai
+    if recording_status and message.channel.name == recording_channel:
+        filename = f"{recording_channel}_record.csv"
+        with open(filename, "a", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow([message.author.name, message.content, message.created_at])
+
+    await bot.process_commands(message)
+
+@bot.command()
+async def convert_and_upload(ctx, category_name: str, *, channel_name: str):
+    guild = ctx.guild
+
+    # Format nama kategori dan channel
+    formatted_category_name = category_name.strip()
+    formatted_channel_name = channel_name.lower().replace(" ", "-")
+
+    # Temukan kategori berdasarkan nama
+    category = discord.utils.get(guild.categories, name=formatted_category_name)
+    if not category:
+        await ctx.send(f"Category with named **{formatted_category_name}** not found!")
+        return
+
+    # Tentukan nama channel default
+    default_channel_name = f"{formatted_category_name.lower().replace(' ', '-')}-projects"
+
+    # Temukan channel default dalam kategori
+    default_channel = discord.utils.get(category.text_channels, name=default_channel_name)
+
+    # Validasi: Perintah hanya dijalankan di channel default
+    if ctx.channel != default_channel:
+        await ctx.send(f"This command can only be run on the default channel **{default_channel_name}**!")
+        return
+
+    # Konversi CSV ke PDF
+    csv_filename = f"{formatted_channel_name}_record.csv"
+    pdf_filename = f"{formatted_channel_name}_record.pdf"
+
+    try:
+        csv_to_pdf(csv_filename, pdf_filename)
+    except FileNotFoundError:
+        await ctx.send(f"CSV file `{csv_filename}` not found. Ensure recording was started for this channel.")
+        return
+
+    # Upload file PDF to AnonFiles
+    result = upload_to_gofiles(pdf_filename)
+    await ctx.send(result)
+
+def csv_to_pdf(csv_filename, pdf_filename):
+    pdf = FPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_page()
+    
+    #Set Title Column
+    pdf.set_font("Arial", "B" ,size=12)
+    pdf.cell(40, 10, "Author", border=1, align="C")
+    pdf.cell(100, 10, "Content", border=1, align="C")
+    pdf.cell(40, 10, "Timestamp", border=1, align="C")
+    pdf.ln()
+    
+    #Set font
+    pdf.set_font("Arial", "", 10)
+
+    with open(csv_filename, "r", encoding="utf-8") as f:
+        reader = csv.reader(f)
+        for row in reader:
+            author, content, timestamp = row
+            
+            try:
+                timestamp_obj = datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S.%f+00:00")
+                timestamp = timestamp_obj.strftime("%Y-%m-%d %H:%M:%S")  # Format yang lebih bersih
+            except ValueError:
+                pass
+            
+            content = content[:150] + '...' if len(content) > 150 else content  # Truncate jika terlalu panjang
+
+            pdf.cell(40, 10, author, border=1, align="C")
+            pdf.cell(100, 10, content, border=1, align="C")
+            pdf.cell(40, 10, timestamp, border=1, align="C")
+            pdf.ln()
+
+    pdf.output(pdf_filename)
+
+def upload_to_gofiles(filename):
+    """Upload file to AnonFiles and return the link."""
+    try:
+        with open(filename, "rb") as f:
+            response = requests.post("https://store1.gofile.io/uploadFile", files={"file": f}, verify=False)
+            if response.status_code != 200:
+                return f"Failed to upload. HTTP Status Code: {response.status_code}"
+            
+            data = response.json()
+            if data["status"] == "ok":
+                file_url = data["data"]["downloadPage"]
+                return f"File uploaded successfully to GoFiles!\nLink: {file_url}"
+            else:
+                return f"Failed to upload file: {data.get('error', {}).get('message', 'Unknown error')}"
+    except FileNotFoundError:
+        return f"File `{filename}` not found!"
+    except Exception as e:
+        return f"An error occurred: {e}"
         
 @bot.command()
 async def end_gp(ctx, *, category_name: str):
