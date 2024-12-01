@@ -1,10 +1,12 @@
 from flask import Flask
 from threading import Thread
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord.utils import get
 import asyncio
 import requests
+import wave
+import subprocess
 from dotenv import load_dotenv
 import os
 from fpdf import FPDF
@@ -36,6 +38,7 @@ def run_flask():
 intents = discord.Intents.default()
 intents.messages = True
 intents.message_content = True
+intents.voice_states = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # Flask thread check
@@ -46,6 +49,10 @@ roles = {}
 emails = {}
 recording_status = False
 recording_channel = None
+MAX_RECORD_DURATION = 5 * 60
+is_recording = False
+voice_client = None
+recording_data = []
 
 @app.route('/api/bot_invite', methods=['GET'])
 def bot_invite():
@@ -124,10 +131,11 @@ async def ping(ctx):
         "5. !pick_role <role_name> : Select role\n"
         "6. !change_role <@Username> <role_name> : Change role other member if you are Admin\n"
         "7. !add_meet <category _name> <voice_channel_name> : Create voice channel\n"
-        "8. !start_record <channel_name> : Record activity in text channel\n"
-        "9. !stop_record : Stop recording\n"
+        "8. !start_text <category_name> <channel_name> : Record activity in text channel\n"
+        "9. !stop_text <category_name> <channel_name> : Stop recording text channel\n"
         "10. !convert_and_upload <channel_name> : Convert csv files record to pdf and upload to AnonFiles\n"
-        "11. !get_record : Request the recording result\n"
+        "11. !start_voice <category_name> <voice_channel_name> : Record activity in voice channel\n"
+        "13. !stop_voice <category_name> <voice_channel_name> : Stop recording voice channel\n"
         "12. !end_gp : <category_name> : Delete \n"
         "13. !clear : Clear history"
     )
@@ -361,7 +369,7 @@ async def add_meet(ctx, category_name: str, *, voice_channel_name: str):
         await ctx.send(f"Something error: {e}")
 
 @bot.command()
-async def start_record(ctx, category_name: str, *, channel_name: str):
+async def start_text(ctx, category_name: str, *, channel_name: str):
     guild = ctx.guild
 
     # Format nama kategori dan channel
@@ -392,7 +400,7 @@ async def start_record(ctx, category_name: str, *, channel_name: str):
     await ctx.send(f"Recording started for channel **{formatted_channel_name}** in category **{formatted_category_name}**.")
 
 @bot.command()
-async def stop_record(ctx, category_name: str, *, channel_name: str):
+async def stop_text(ctx, category_name: str, *, channel_name: str):
     guild = ctx.guild
 
     # Format nama kategori dan channel
@@ -527,6 +535,202 @@ def upload_to_gofiles(filename):
             if data["status"] == "ok":
                 file_url = data["data"]["downloadPage"]
                 return f"File uploaded successfully to GoFiles!\nLink: {file_url}"
+            else:
+                return f"Failed to upload file: {data.get('error', {}).get('message', 'Unknown error')}"
+    except FileNotFoundError:
+        return f"File `{filename}` not found!"
+    except Exception as e:
+        return f"An error occurred: {e}"
+    
+# Command: Rekam Voice Channel
+@bot.command()
+async def start_voice(ctx, category_name: str, *, voice_channel_name: str):
+    global is_recording, recording_data, voice_client
+
+    if is_recording:
+        await ctx.send("Rekaman sedang berlangsung. Gunakan `!stop_record_voice` untuk menghentikan.")
+        return
+
+    guild = ctx.guild
+    channel = discord.utils.get(guild.voice_channels, name=voice_channel_name)
+    
+    # Format nama kategori dan channel
+    formatted_category_name = category_name.strip()
+    formatted_voice_channel_name = voice_channel_name.lower().replace(" ", "-")
+
+    # Temukan kategori berdasarkan nama
+    category = discord.utils.get(guild.categories, name=formatted_category_name)
+    if not category:
+        await ctx.send(f"Category with named **{formatted_category_name}** not found!")
+        return
+
+    # Tentukan nama channel default
+    default_channel_name = f"{formatted_category_name.lower().replace(' ', '-')}-projects"
+
+    # Temukan channel default dalam kategori
+    default_channel = discord.utils.get(category.text_channels, name=default_channel_name)
+
+    # Validasi: Perintah hanya dijalankan di channel default
+    if ctx.channel != default_channel:
+        await ctx.send(f"This command can only be run on the default channel **{default_channel_name}**!")
+        return
+    
+    # Cek apakah channel sudah ada dalam kategori
+    existing_channel = discord.utils.get(category.channels, name=formatted_voice_channel_name)
+    if existing_channel:
+        await ctx.send(f"Channel with named **{formatted_voice_channel_name}** is already in Category Named **{category.name}**!")
+        return
+
+    if not channel:
+        await ctx.send(f"Voice channel **{voice_channel_name}** tidak ditemukan!")
+        return
+
+    try:
+        # Hubungkan bot ke voice channel
+        voice_client = await channel.connect()
+        await ctx.send(f"Bot terhubung ke voice channel **{voice_channel_name}**. Mulai merekam selama maksimal 5 menit...")
+
+        # Reset buffer dan set status rekaman
+        recording_data = []
+        is_recording = True
+
+        def callback(data):
+            if is_recording:
+                recording_data.append(data)
+
+        # Mulai mendengarkan audio
+        voice_client.listen(discord.AudioSink(callback=callback))
+
+        # Tunggu hingga durasi maksimal atau perintah berhenti
+        await asyncio.sleep(MAX_RECORD_DURATION)
+        if is_recording:  # Jika rekaman masih aktif setelah durasi
+            await stop_recording(ctx)
+
+    except Exception as e:
+        await ctx.send(f"Terjadi kesalahan: {e}")
+        if voice_client and voice_client.is_connected():
+            await voice_client.disconnect()
+
+# Command: Stop Rekaman Voice Channel
+@bot.command()
+async def stop_voice(ctx, category_name: str, *, voice_channel_name: str):
+    guild = ctx.guild
+    
+    # Format nama kategori dan channel
+    formatted_category_name = category_name.strip()
+    formatted_voice_channel_name = voice_channel_name.lower().replace(" ", "-")
+
+    # Temukan kategori berdasarkan nama
+    category = discord.utils.get(guild.categories, name=formatted_category_name)
+    if not category:
+        await ctx.send(f"Category with named **{formatted_category_name}** not found!")
+        return
+
+    # Tentukan nama channel default
+    default_channel_name = f"{formatted_category_name.lower().replace(' ', '-')}-projects"
+
+    # Temukan channel default dalam kategori
+    default_channel = discord.utils.get(category.text_channels, name=default_channel_name)
+
+    # Validasi: Perintah hanya dijalankan di channel default
+    if ctx.channel != default_channel:
+        await ctx.send(f"This command can only be run on the default channel **{default_channel_name}**!")
+        return
+    
+    # Cek apakah channel sudah ada dalam kategori
+    existing_channel = discord.utils.get(category.channels, name=formatted_voice_channel_name)
+    if existing_channel:
+        await ctx.send(f"Channel with named **{formatted_voice_channel_name}** is already in Category Named **{category.name}**!")
+        return
+    
+    global is_recording
+    if not is_recording:
+        await ctx.send("Tidak ada rekaman yang sedang berlangsung.")
+        return
+
+    # Hentikan rekaman
+    await stop_recording(ctx)
+
+async def stop_recording(ctx, category_name: str, *, voice_channel_name: str):
+    guild = ctx.guild
+    
+    # Format nama kategori dan channel
+    formatted_category_name = category_name.strip()
+    formatted_voice_channel_name = voice_channel_name.lower().replace(" ", "-")
+
+    # Temukan kategori berdasarkan nama
+    category = discord.utils.get(guild.categories, name=formatted_category_name)
+    if not category:
+        await ctx.send(f"Category with named **{formatted_category_name}** not found!")
+        return
+
+    # Tentukan nama channel default
+    default_channel_name = f"{formatted_category_name.lower().replace(' ', '-')}-projects"
+
+    # Temukan channel default dalam kategori
+    default_channel = discord.utils.get(category.text_channels, name=default_channel_name)
+
+    # Validasi: Perintah hanya dijalankan di channel default
+    if ctx.channel != default_channel:
+        await ctx.send(f"This command can only be run on the default channel **{default_channel_name}**!")
+        return
+    
+    # Cek apakah channel sudah ada dalam kategori
+    existing_channel = discord.utils.get(category.channels, name=formatted_voice_channel_name)
+    if existing_channel:
+        await ctx.send(f"Channel with named **{formatted_voice_channel_name}** is already in Category Named **{category.name}**!")
+        return
+    
+    global is_recording, recording_data, voice_client
+
+    is_recording = False  # Ubah status rekaman
+    if voice_client and voice_client.is_connected():
+        await voice_client.disconnect()  # Bot keluar dari voice channel
+        voice_client = None
+
+    # Simpan data audio ke file WAV
+    wav_filename = "voice_record.wav"
+    save_audio(recording_data, wav_filename)
+
+    # Konversi WAV ke MP3 menggunakan FFmpeg
+    mp3_filename = "voice_record.mp3"
+    convert_to_mp3(wav_filename, mp3_filename)
+
+    # Hapus file WAV setelah konversi
+    os.remove(wav_filename)
+
+    # Unggah ke GoFile
+    file_url = upload_to_gofiles(mp3_filename)
+
+    await ctx.send(f"Rekaman selesai. File diunggah ke GoFile: {file_url}")
+
+# Fungsi: Simpan data audio ke file WAV
+def save_audio(data, filename):
+    """Menyimpan data audio ke file WAV."""
+    with wave.open(filename, "wb") as wav_file:
+        wav_file.setnchannels(1)  # Mono
+        wav_file.setsampwidth(2)  # 16-bit audio
+        wav_file.setframerate(48000)  # Frekuensi sampling
+        wav_file.writeframes(b"".join(data))
+
+# Fungsi: Konversi WAV ke MP3
+def convert_to_mp3(wav_filename, mp3_filename):
+    """Mengonversi file WAV ke MP3 menggunakan FFmpeg."""
+    command = ["ffmpeg", "-y", "-i", wav_filename, "-vn", "-ar", "44100", "-ac", "2", "-b:a", "192k", mp3_filename]
+    subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+# Fungsi: Upload file ke GoFiles
+def upload_to_gofiles(filename):
+    """Mengunggah file ke GoFile dan mengembalikan tautan unduhan."""
+    try:
+        with open(filename, "rb") as f:
+            response = requests.post("https://api.gofile.io/uploadFile", files={"file": f}, verify=False)
+            if response.status_code != 200:
+                return f"Failed to upload. HTTP Status Code: {response.status_code}"
+            
+            data = response.json()
+            if data["status"] == "ok":
+                return data["data"]["downloadPage"]
             else:
                 return f"Failed to upload file: {data.get('error', {}).get('message', 'Unknown error')}"
     except FileNotFoundError:
