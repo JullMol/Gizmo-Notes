@@ -1736,3 +1736,44 @@ td {
 .delete-btn:hover {
     background-color: #C0392B;
 }
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 60px; /* Mengecilkan sidebar untuk mobile */
+        height: auto;
+        overflow-x: hidden; /* Menyembunyikan scroll horizontal */
+    }
+
+    .sidebar h2 {
+        display: none; /* Menyembunyikan judul sidebar untuk menghemat ruang */
+    }
+
+    .sidebar ul li a {
+        font-size: 12px;
+        padding: 6px; /* Mengecilkan padding */
+    }
+
+    .main-content {
+        margin-left: 60px; /* Sesuaikan dengan lebar sidebar */
+        padding: 15px;
+    }
+
+    .note-grid, .note-grid-grouped {
+        flex-wrap: nowrap; /* Mengaktifkan scroll horizontal */
+        gap: 5px; /* Kurangi jarak antar elemen */
+    }
+
+    .class-notes, .class-notes-grouped {
+        width: 100%; /* Memenuhi lebar layar */
+        left: 0; /* Tidak terpengaruh sidebar */
+        padding: 15px;
+    }
+
+    .result-card {
+        min-height: 150px; /* Sesuaikan tinggi minimum kartu di tampilan mobile */
+    }
+
+    .timer-view {
+        margin-left: 0; /* Hilangkan margin di mobile */
+    }
+}
