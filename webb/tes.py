@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 import asyncio
-import requests, certifi
+import requests
 from dotenv import load_dotenv
 import os
 from fpdf import FPDF
@@ -60,22 +60,22 @@ async def on_member_update(before, after):
     # Temukan channel bot_testing
     channel = discord.utils.get(guild.text_channels, name=channel_name)
     if not channel:
-        print(f"Channel **{channel_name}** tidak ditemukan!")
+        print(f"Channel **{channel_name}** not found!")
         return
 
     # Bersihkan semua pesan di channel
     try:
         await channel.purge()
-        print(f"Pesan di channel **{channel_name}** telah dihapus.")
+        print(f"Message on channel **{channel_name}** deleted.")
     except discord.Forbidden:
-        print("Bot tidak memiliki izin untuk menghapus pesan.")
+        print("Bot does not have permission to delete messages.")
     except discord.HTTPException as e:
-        print(f"Terjadi kesalahan saat menghapus pesan: {e}")
+        print(f"An error occurred while deleting a message: {e}")
 
 @bot.command()
 async def clear(ctx):
     await ctx.channel.purge()
-    await ctx.send("Channel telah dibersihkan!")
+    await ctx.send("Channel has been cleared!")
 
 @bot.event
 async def on_member_join(member):
@@ -85,17 +85,17 @@ async def on_member_join(member):
     # Temukan channel bot_testing
     channel = discord.utils.get(guild.text_channels, name=channel_name)
     if not channel:
-        print(f"Channel **{channel_name}** tidak ditemukan!")
+        print(f"Channel **{channel_name}** not found!")
         return
 
     # Bersihkan semua pesan di channel
     try:
         await channel.purge()
-        await channel.send(f"Selamat datang di server, {member.mention}! Channel telah dibersihkan.")
+        await channel.send(f"Welcome to Gizmo GP Server, {member.mention}!")
     except discord.Forbidden:
-        print("Bot tidak memiliki izin untuk menghapus pesan.")
+        print("Bot not have permission.")
     except discord.HTTPException as e:
-        print(f"Terjadi kesalahan saat menghapus pesan: {e}")
+        print(f"Something error: {e}")
 
 @bot.event
 async def on_ready():
@@ -244,11 +244,11 @@ async def role(ctx):
     # Periksa apakah role-role tersebut ada di server
     available_roles = [role.name for role in guild.roles if role.name in role_names]
     if not available_roles:
-        await ctx.send("Tidak ada role yang tersedia di server ini!")
+        await ctx.send("There are no roles available on this server!")
         return
 
     # Kirim daftar role ke user
-    await ctx.send(f"Role yang tersedia: {', '.join(available_roles)}")
+    await ctx.send(f"Available Roles: {', '.join(available_roles)}")
 
 
 @bot.command()
@@ -259,12 +259,12 @@ async def pick_role(ctx, *, role_name: str):
     # Periksa apakah role ada di server
     role = discord.utils.get(guild.roles, name=role_name)
     if not role:
-        await ctx.send(f"Role **{role_name}** tidak ditemukan! Gunakan `!role` untuk melihat daftar role yang tersedia.")
+        await ctx.send(f"Role **{role_name}** not found! Use `!role` to view the list of available roles.")
         return
 
     # Periksa apakah user sudah memiliki role tersebut
     if role in member.roles:
-        await ctx.send(f"Anda sudah memiliki role **{role_name}**!")
+        await ctx.send(f"You already have a role **{role_name}**!")
         return
 
     # Hapus role lain sebelum menambahkan role baru
@@ -278,16 +278,15 @@ async def pick_role(ctx, *, role_name: str):
 
         # Tambahkan role baru
         await member.add_roles(role)
-        await ctx.send(f"Role Anda telah diperbarui menjadi **{role_name}**!")
+        await ctx.send(f"Your role has been updated to **{role_name}**!")
     except discord.Forbidden:
-        await ctx.send("Saya tidak memiliki izin untuk mengubah role Anda!")
+        await ctx.send("I don't have permission to change your role!")
     except discord.HTTPException as e:
-        await ctx.send(f"Terjadi kesalahan: {e}")
+        await ctx.send(f"Something error: {e}")
 
 @bot.command()
 @commands.has_role("Admin")  # Hanya bisa dijalankan oleh user dengan role "Admin"
 async def change_role(ctx, member: discord.Member, *, role_name: str):
-    """Mengubah role anggota lain. Hanya untuk Admin."""
     guild = ctx.guild
 
     # Daftar role yang diizinkan
@@ -296,12 +295,12 @@ async def change_role(ctx, member: discord.Member, *, role_name: str):
     # Validasi role
     role = discord.utils.get(guild.roles, name=role_name)
     if not role or role_name not in allowed_roles:
-        await ctx.send(f"Role **{role_name}** tidak valid! Role yang tersedia: {', '.join(allowed_roles)}")
+        await ctx.send(f"Role **{role_name}** invalid! Available roles: {', '.join(allowed_roles)}")
         return
 
     # Periksa apakah member sudah memiliki role tersebut
     if role in member.roles:
-        await ctx.send(f"Anggota **{member.display_name}** sudah memiliki role **{role_name}**!")
+        await ctx.send(f"Member **{member.display_name}** already have a role **{role_name}**!")
         return
 
     # Hapus role lama (jika ada) sebelum menambahkan role baru
@@ -314,11 +313,11 @@ async def change_role(ctx, member: discord.Member, *, role_name: str):
 
         # Tambahkan role baru
         await member.add_roles(role)
-        await ctx.send(f"Role anggota **{member.display_name}** telah diubah menjadi **{role_name}** oleh **{ctx.author.display_name}**.")
+        await ctx.send(f"Member role **{member.display_name}** has been changed to **{role_name}** by **{ctx.author.display_name}**.")
     except discord.Forbidden:
-        await ctx.send("Saya tidak memiliki izin untuk mengubah role anggota ini!")
+        await ctx.send("I do not have permission to change this member role!")
     except discord.HTTPException as e:
-        await ctx.send(f"Terjadi kesalahan: {e}")
+        await ctx.send(f"Something error: {e}")
         
 @bot.command()
 async def add_meet(ctx, category_name: str, *, voice_channel_name: str):
@@ -428,7 +427,6 @@ async def stop_record(ctx, category_name: str, *, channel_name: str):
 
 @bot.event
 async def on_message(message):
-    """Record messages if recording is active."""
     global recording_status, recording_channel
 
     # Abaikan pesan dari bot itu sendiri
@@ -519,7 +517,6 @@ def csv_to_pdf(csv_filename, pdf_filename):
     pdf.output(pdf_filename)
 
 def upload_to_gofiles(filename):
-    """Upload file to AnonFiles and return the link."""
     try:
         with open(filename, "rb") as f:
             response = requests.post("https://store1.gofile.io/uploadFile", files={"file": f}, verify=False)
