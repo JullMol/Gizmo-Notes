@@ -724,7 +724,7 @@ def upload_to_gofiles(filename):
     """Mengunggah file ke GoFile dan mengembalikan tautan unduhan."""
     try:
         with open(filename, "rb") as f:
-            response = requests.post("https://api.gofile.io/uploadFile", files={"file": f}, verify=False)
+            response = requests.post("https://store1.gofile.io/uploadFile", files={"file": f}, verify=True)
             if response.status_code != 200:
                 return f"Failed to upload. HTTP Status Code: {response.status_code}"
             
