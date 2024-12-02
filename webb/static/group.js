@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             // Menambahkan data anggota ke dalam tabel
-            data.forEach(member => {
+            Object.values(data).forEach(member => {
                 const newRow = tbody.insertRow();
                 const nameCell = newRow.insertCell(0);
                 const emailCell = newRow.insertCell(1);
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Delete';
                 deleteButton.addEventListener('click', function () {
-                    fetch(`/api/members/${member.id}`, { method: 'DELETE' })
+                    fetch(`/api/members/${member.name}`, { method: 'GET' })
                         .then(response => {
                             if (!response.ok) throw new Error('Failed to delete member');
                             newRow.remove();

@@ -2,7 +2,7 @@ from flask import Flask, render_template, Blueprint, request, jsonify
 
 invite = Blueprint('invite', __name__)
 
-members = []
+members = {}
 
 @invite.route('/')
 def index():
@@ -60,8 +60,12 @@ def Calendar():
 def discord():
     return render_template('Invite.html')
 
-@invite.route('/api/members', methods=['GET'])
-def get_members():
+@invite.route('/api/members/<name_member>', methods=['GET'])
+@invite.route('/api/members/', methods=['GET'])
+def get_members(name_member=None):
+    if name_member is not None:
+        if members[name_member]:
+            del members[name_member]
     return jsonify(members)
 
 @invite.route('/invite', methods=['POST'])
@@ -81,7 +85,7 @@ def dc():
         'role': data['role']
     }
 
-    members.append(member_data)  # Menambahkan ke list members
+    members[data.get('name')] = member_data  # Menambahkan ke list members
     print(members)
     return jsonify({'message': 'Member added successfully!'}), 201
 if __name__ == '__main__':
