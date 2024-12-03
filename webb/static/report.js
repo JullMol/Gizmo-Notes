@@ -70,7 +70,7 @@ async function getData(dateKey) {
             study: dts.stdy,
             exercise: dts.exercise
         },
-        study: dts.stdy
+        study: dts.stdy / 60
     }
 
     return ret;
@@ -116,6 +116,7 @@ async function updateDailyChart() {
     // if (!dateData.has(dateKey)) {
     // }
     dateData.set(dateKey, await getData(dateKey));
+    updateStudyChart()
     const data = dateData.get(dateKey);
     console.log(data)
 
@@ -154,7 +155,7 @@ async function updateDailyChart() {
     }
 }
 
-function updateStudyChart() {
+async function updateStudyChart() {
     const labels = [];
     const data = [];
     
@@ -231,19 +232,19 @@ function updateStudyChart() {
 }
 
 // Navigation handlers
-document.getElementById('prevDay').addEventListener('click', () => {
+document.getElementById('prevDay').addEventListener('click', async () => {
     selectedDate.setDate(selectedDate.getDate() - 1);
     updateDateDisplay();
-    updateDailyChart();
-    updateStudyChart();
+    await updateDailyChart();
+    // updateStudyChart();
 });
 
-document.getElementById('nextDay').addEventListener('click', () => {
+document.getElementById('nextDay').addEventListener('click', async () => {
     if (selectedDate.toDateString() !== new Date().toDateString()) {
         selectedDate.setDate(selectedDate.getDate() + 1);
         updateDateDisplay();
-        updateDailyChart();
-        updateStudyChart();
+        await updateDailyChart();
+        // updateStudyChart();
     }
 });
 

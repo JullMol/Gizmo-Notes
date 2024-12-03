@@ -15,7 +15,7 @@ class Timer(db.Model):
     task = db.Column(db.String(255), nullable=False)
     status = db.Column(db.String(50), nullable=False)
     duration = db.Column(db.Integer, nullable=False)
-    date = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
+    date = db.Column(db.DateTime, nullable=False)
 
 class TimerSchema(Schema):
     id = fields.Integer(dump_only=True)

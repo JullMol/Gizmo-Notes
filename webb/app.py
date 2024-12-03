@@ -4,7 +4,7 @@ from database import db, Member  # Import db dan Member dari database.py
 app = Flask(__name__)
 
 # Konfigurasi database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local_database_3.db'  # Menggunakan SQLite
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local_database_4.db'  # Menggunakan SQLite
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Inisialisasi SQLAlchemy

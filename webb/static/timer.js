@@ -10,6 +10,7 @@ function fetchTasks(date = null) {
         .then(data => {
             console.log('Fetched tasks:', data); // Debug
             tasks = data.tasks; // Simpan daftar tugas
+            console.log(tasks)
             renderTaskList(); // Render tugas di tabel
         })
         .catch(error => {
@@ -400,7 +401,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     taskDescription: task,
                     startTime: formattedStartTime,
                     endTime: formattedEndTime,
-                    date: selectedDate.toISOString().split('T')[0]
+                    date: selDate
                 })
             })
             .then(response => {
@@ -494,23 +495,9 @@ document.addEventListener('DOMContentLoaded', function () {
         fetchTasks(date)
     }
 
-    function fetchTasks(date) {
-        const url = date ? `/tasks?date=${date}` : '/tasks';
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    tasks = data.tasks;
-                    renderTaskList();
-                } else {
-                    alert('Gagal mengambil tugas: ' + data.message);
-                }
-            })
-            .catch(error => console.error('Error fetching tasks:', error));
-    }  
-
     // Fungsi Kalender
-    let selectedDate = new Date();  
+    let selectedDate = new Date(); 
+    let selDate =  new Date().toISOString().split('T')[0]
 
     function renderCalendar(date) {
         const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -547,6 +534,8 @@ document.addEventListener('DOMContentLoaded', function () {
             dayCell.addEventListener('click', () => {
                 selectedDate = new Date(date.getFullYear(), date.getMonth(), i);
                 const formattedDate = selectedDate.toISOString().split('T')[0];
+                dateMinusOneDay = new Date(selectedDate.getTime() + (86400 * 1000)).toISOString().split('T')[0]
+                selDate = dateMinusOneDay
                 currentDate.textContent = selectedDate.toLocaleDateString('default', {
                     weekday: 'short',
                     month: 'short',
@@ -554,7 +543,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
                 datePicker.classList.remove('active');
                 renderCalendar(selectedDate);
-                fetchTasksByDate(formattedDate);
+                // fetchTasksByDate(formattedDate);
+                fetchTasks(dateMinusOneDay)
                 fetchGoalsByDate(formattedDate);
             });
 
