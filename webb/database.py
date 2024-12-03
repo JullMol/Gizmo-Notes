@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import time
+from marshmallow import Schema, fields
 
 # Inisialisasi SQLAlchemy
 db = SQLAlchemy()
@@ -14,6 +15,16 @@ class Timer(db.Model):
     task = db.Column(db.String(255), nullable=False)
     status = db.Column(db.String(50), unique=True, nullable=False)
     duration = db.Column(db.Integer, nullable=False)
+    date = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
+
+class TimerSchema(Schema):
+    id = fields.Integer(dump_only=True)
+    start_time = fields.DateTime()
+    end_time = fields.DateTime()
+    task = fields.String(required=True)
+    status = fields.String(required=True)
+    duration = fields.Integer(required=True)
+    date = fields.DateTime(dump_only=True)
     
 class ToDoListD(db.Model):
     __tablename__ = 'todo_listsD'

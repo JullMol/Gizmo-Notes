@@ -3,7 +3,7 @@ from .database import db
 import os
 
 app = Flask(__name__)
-DB_name = 'local_database.db'
+DB_name = 'local_database_2.db'
 def create_app():
     # Konfigurasi database
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_name}'  # Menggunakan SQLite

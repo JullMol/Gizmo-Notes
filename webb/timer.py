@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, Blueprint, jsonify
 from datetime import datetime, timedelta
 import time
+from .database import db, Timer, TimerSchema
 
 timer = Blueprint('timer', __name__)
 
@@ -99,6 +100,9 @@ def add_task():
             # Parse times and calculate duration
             start_time = datetime.strptime(start_time_str.strip(), '%I:%M %p')
             end_time = datetime.strptime(end_time_str.strip(), '%I:%M %p')
+            date_formatted = datetime.strptime(date, '%Y-%m-%d')
+            start_time_from_date = datetime.strptime(date + ' ' + start_time_str.strip(), '%Y-%m-%d %I:%M %p')
+            end_time_from_date = datetime.strptime(date + ' ' + end_time_str.strip(), '%Y-%m-%d %I:%M %p')
             
             # Validasi apakah waktu overlap
             if is_time_overlap(start_time, end_time, tasks):
@@ -136,6 +140,27 @@ def add_task():
             if date not in tasks_by_date:
                 tasks_by_date[date] = []
             tasks_by_date[date].append(task)
+
+            dt = {
+                'task': task_description,
+                'status': 'not_started',
+                'duration': duration,
+                'start_time': start_time_str,
+                'end_time': end_time_str,
+                'date': date
+            }
+
+            timer_table = Timer(
+                task=task_description,
+                status='not_started',
+                duration=duration,
+                start_time=start_time_from_date,
+                end_time=end_time_from_date,
+                date=date_formatted
+            )
+            db.session.add(timer_table)
+            db.session.commit()
+
             print(f"Task added for {date}: {task}")
             return jsonify({'status': 'success', 'message': 'Task added successfully', 'task': task}), 200
 
@@ -217,17 +242,39 @@ def get_tasks():
 
         if date:
             tasks = tasks_by_date.get(date, [])
+
+            date_parsed = datetime.strptime(date, '%Y-%m-%d')
+
+            # get from db
+            tasks_ = Timer.query.filter_by(date=date_parsed).all()
+            print(tasks_, flush=True)
         else:
             # Gabungkan semua task jika tidak ada tanggal yang diberikan
             tasks = [task for tasks in tasks_by_date.values() for task in tasks]
 
-        # Tambahkan atribut `startable`
-        result = [
-            {**task, 'startable': task.get('status') != 'running'}
-            for task in tasks
-        ]
+            tasks_ = Timer.query.all()
+            print(tasks_, flush=True)
 
-        return jsonify({'status': 'success', 'tasks': result}), 200
+        # Tambahkan atribut `startable`
+        # result = [
+        #     {**task, 'startable': task.get('status') != 'running'}
+        #     for task in tasks_
+        # ]
+
+        res = []
+        schema = TimerSchema(many=True)
+        for task in schema.dump(tasks_):
+            # convert start_time to %I:%M %p format
+            start = datetime.strptime(task['start_time'], '%Y-%m-%dT%H:%M:%S')
+            end = datetime.strptime(task['end_time'], '%Y-%m-%dT%H:%M:%S')
+            task['start_time'] = datetime.strftime(start, '%I:%M %p')
+            task['end_time'] = datetime.strftime(end, '%I:%M %p')
+            if task['status'] != 'running':
+                res.append({**task, 'startable': True, 'startTime': task['start_time'], 'endTime': task['end_time'], 'description': task['task']})
+            else:
+                res.append({**task, 'startable': False, 'startTime': task['start_time'], 'endTime': task['end_time'], 'description': task['task']})
+
+        return jsonify({'status': 'success', 'tasks': res}), 200
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
     
