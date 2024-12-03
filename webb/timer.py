@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, Blueprint, jsonify
 from datetime import datetime, timedelta
 import time
+from .database import Timer, db
 
 timer = Blueprint('timer', __name__)
 
@@ -83,6 +84,7 @@ def add_task():
         start_time_str = data.get('startTime')
         end_time_str = data.get('endTime')
         date = data.get('date')
+        status = data.get('status')
         
         print(f"Task: {task_description}")  # Debug print
         print(f"Start time: {start_time_str}")  # Debug print
@@ -97,8 +99,8 @@ def add_task():
 
         try:
             # Parse times and calculate duration
-            start_time = datetime.strptime(start_time_str.strip(), '%I:%M %p')
-            end_time = datetime.strptime(end_time_str.strip(), '%I:%M %p')
+            start_time = datetime.strptime(start_time_str, '%I:%M %p').time()
+            end_time = datetime.strptime(end_time_str, '%I:%M %p').time()
             
             # Validasi apakah waktu overlap
             if is_time_overlap(start_time, end_time, tasks):
@@ -119,24 +121,25 @@ def add_task():
                 duration += 24 * 60  # Add 24 hours in minutes
             
             print(f"Calculated duration: {duration} minutes")  # Debug print
-
-            tasks_for_date = tasks_by_date.get(date, [])
+            new_data = Timer(task=task_description, date=datetime.strptime(date, "%Y-%m-%d").date(), start_time=start_time, end_time=end_time, duration=duration, status= 'pending')
+            db.session.add(new_data)
+            db.session.commit()
             
             # Store task
             task = {
-                'id': len(tasks_for_date),
+                'id': new_data.id,
                 'description': task_description,
                 'startTime': start_time_str,
                 'endTime': end_time_str,
                 'date': date,
                 'duration': duration,
             }
-            tasks.append(task)
+            # tasks.append(task)
             
-            if date not in tasks_by_date:
-                tasks_by_date[date] = []
-            tasks_by_date[date].append(task)
-            print(f"Task added for {date}: {task}")
+            # if date not in tasks_by_date:
+            #     tasks_by_date[date] = []
+            # tasks_by_date[date].append(task)
+            # print(f"Task added for {date}: {task}")
             return jsonify({'status': 'success', 'message': 'Task added successfully', 'task': task}), 200
 
             # return jsonify({
@@ -167,23 +170,25 @@ def start_task(task_id):
     Endpoint untuk memulai timer berdasarkan ID tugas.
     """
     try:
-        if task_id < 0 or task_id >= len(tasks):
+        sum_timer = Timer.query.count()
+        if task_id < 0 and task_id >= sum_timer:
             return jsonify({
                 'status': 'error',
                 'message': 'Invalid task ID'
             }), 400
             
-        if current_task_index is not None:
-            tasks[current_task_index]['status'] = 'completed'
-
-        task = tasks[task_id]
-        task['status'] = 'running'
+        # if current_task_index is not None:
+        #     tasks[current_task_index]['status'] = 'completed'
+        task = Timer.query.filter_by(id=task_id).first()
+        # task = tasked
+        task.status = 'running'
+        db.session.commit()
         current_task_index = task_id
 
         return jsonify({
             'status': 'success',
-            'duration': task['duration'],
-            'message': f'Timer started for task: {task["description"]}'
+            'duration': task.duration,
+            'message': f'Timer started for task: {task.task}'
         })
 
     except Exception as e:
@@ -214,18 +219,34 @@ def get_tasks():
     try:
         # Ambil parameter tanggal (jika ada)
         date = request.args.get('date')
-
+        
         if date:
-            tasks = tasks_by_date.get(date, [])
+            tasks = Timer.query.filter_by(date=datetime.strptime(date, "%Y-%m-%d").time()).all()
         else:
             # Gabungkan semua task jika tidak ada tanggal yang diberikan
-            tasks = [task for tasks in tasks_by_date.values() for task in tasks]
+            # tasks = [task for tasks in tasks_by_date.values() for task in tasks]
+            tasks = Timer.query.all()
 
         # Tambahkan atribut `startable`
+        # result = [
+        #     {**task.__dict__, 'startable': task.status != 'running'}
+        #     for task in tasks
+        #     if not task.__dict__.get('_sa_instance_state')  # Hilangkan atribut internal SQLAlchemy
+        # ]
         result = [
-            {**task, 'startable': task.get('status') != 'running'}
+            {
+                'id': task.id,
+                'description': task.task,
+                'startTime': task.start_time.strftime('%I:%M %p'),
+                'endTime': task.end_time.strftime('%I:%M %p'),
+                'date': task.date.strftime('%Y-%m-%d'),
+                'duration': task.duration,
+                'startable': task.status != 'running'
+            }
             for task in tasks
         ]
+
+        print(result)
 
         return jsonify({'status': 'success', 'tasks': result}), 200
     except Exception as e:
@@ -341,7 +362,8 @@ def get_notifications(date):
 def reset_task():
     global tasks, current_task_index
     if current_task_index is not None:
-        tasks[current_task_index]['status'] = 'completed'
+        task = Timer.query.filter_by(id=current_task_index).first()
+        # tasks[current_task_index]['status'] = 'completed'
         current_task_index = None
     
     return jsonify({

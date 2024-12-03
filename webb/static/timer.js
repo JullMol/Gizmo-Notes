@@ -434,7 +434,7 @@ document.addEventListener('DOMContentLoaded', function () {
         hourDropdown.innerHTML = ''; // Kosongkan dropdown sebelum mengisi ulang
         for (let i = 1; i <= 12; i++) {
             const option = document.createElement('option');
-            option.value = i;
+            option.value = i.toString().padStart(2, '0');
             option.textContent = i.toString().padStart(2, '0'); // Format 2 digit
             hourDropdown.appendChild(option);
         }
@@ -445,7 +445,7 @@ document.addEventListener('DOMContentLoaded', function () {
         minuteDropdown.innerHTML = ''; // Kosongkan dropdown sebelum mengisi ulang
         for (let i = 0; i < 60; i++) {
             const option = document.createElement('option');
-            option.value = i;
+            option.value = i.toString().padStart(2, '0');
             option.textContent = i.toString().padStart(2, '0'); // Format 2 digit
             minuteDropdown.appendChild(option);
         }

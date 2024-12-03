@@ -9,10 +9,11 @@ class Timer(db.Model):
     __tablename__ = 'timers'
     
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    start_time = db.Column(db.DateTime, nullable=False)
-    end_time = db.Column(db.DateTime, nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    start_time = db.Column(db.Time, nullable=False)
+    end_time = db.Column(db.Time, nullable=False)
     task = db.Column(db.String(255), nullable=False)
-    status = db.Column(db.String(50), unique=True, nullable=False)
+    status = db.Column(db.String(50), nullable=False)
     duration = db.Column(db.Integer, nullable=False)
     
 class ToDoListD(db.Model):
@@ -53,4 +54,4 @@ class Member(db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     phone = db.Column(db.String(20), nullable=False)
     role = db.Column(db.String(50), nullable=False)
-    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    created_at = db.Column(db.Date, server_default=db.func.current_date())
