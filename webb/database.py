@@ -13,7 +13,7 @@ class Timer(db.Model):
     start_time = db.Column(db.DateTime, nullable=False)
     end_time = db.Column(db.DateTime, nullable=False)
     task = db.Column(db.String(255), nullable=False)
-    status = db.Column(db.String(50), unique=True, nullable=False)
+    status = db.Column(db.String(50), nullable=False)
     duration = db.Column(db.Integer, nullable=False)
     date = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
 

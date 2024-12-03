@@ -11,17 +11,69 @@ function getDateKey(date) {
     return date.toISOString().split('T')[0];
 }
 
+var tasks = []
+
+async function fetchTasks(date = null) {
+    url = '/tasks'
+    if (date) {
+        url += '?date=' + date
+    }
+    tempt = null
+    await fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Fetched tasks:', data); // Debug
+            tasks = data.tasks; // Simpan daftar tugas
+            tempt = data.tasks
+        })
+        .catch(error => {
+            console.error('Error fetching tasks:', error);
+            alert('Failed to load tasks');
+        });
+
+    return tempt
+}
+
 // Helper function to generate random data for new dates
-function generateRandomData() {
-    return {
+async function getData(dateKey) {
+
+    const dt = await fetchTasks(dateKey)
+
+    // categoryze to every labels based on dt['description']
+    dts = {
+        others: 0,
+        pjct: 0,
+        stdy: 0,
+        exercise: 0
+    }
+    dt.forEach((task) => {
+        console.log(task.description.toLowerCase())
+        switch (task.description.toLowerCase()) {
+            case 'project group':
+                dts.pjct += task.duration;
+                break;
+            case 'study':
+                dts.stdy += task.duration;
+                break;
+            case 'exercise':
+                dts.exercise += task.duration;
+                break;
+            default:
+                dts.others += task.duration;
+        }
+    })
+
+    ret = {
         daily: {
-            others: 50 + Math.random() * 20,
-            projectGroup: 15 + Math.random() * 10,
-            study: 10 + Math.random() * 10,
-            exercise: 3 + Math.random() * 5
+            others: dts.others,
+            projectGroup: dts.pjct,
+            study: dts.stdy,
+            exercise: dts.exercise
         },
-        study: Math.floor(Math.random() * 8) + 2 // 2-10 hours
-    };
+        study: dts.stdy
+    }
+
+    return ret;
 }
 
 // Time update function
@@ -30,7 +82,7 @@ function updateTime() {
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
-    document.getElementById('time').textContent = `${hours} : ${minutes} : ${seconds}`;
+    // document.getElementById('time').textContent = `${hours} : ${minutes} : ${seconds}`;
 }
 
 // Date display update function
@@ -59,21 +111,22 @@ function updateDateDisplay() {
 }
 
 // Chart update functions
-function updateDailyChart() {
+async function updateDailyChart() {
     const dateKey = getDateKey(selectedDate);
-    if (!dateData.has(dateKey)) {
-        dateData.set(dateKey, generateRandomData());
-    }
+    // if (!dateData.has(dateKey)) {
+    // }
+    dateData.set(dateKey, await getData(dateKey));
     const data = dateData.get(dateKey);
+    console.log(data)
 
     const chartData = {
         labels: ['Others', 'Project Group', 'Study', 'Exercise'],
         datasets: [{
             data: [
-                data.daily.others,
-                data.daily.projectGroup,
-                data.daily.study,
-                data.daily.exercise
+                data.daily.others || 0,
+                data.daily.project || 0,
+                data.daily.study || 0,
+                data.daily.exercise || 0
             ],
             backgroundColor: ['#4A4A8A', '#6A6AB8', '#8A8AD8', '#AAAAF8'],
             borderColor: '#1E2A38',
@@ -112,7 +165,7 @@ function updateStudyChart() {
         const dateKey = getDateKey(date);
         
         if (!dateData.has(dateKey)) {
-            dateData.set(dateKey, generateRandomData());
+            dateData.set(dateKey, getData(dateKey));
         }
         
         const dayData = dateData.get(dateKey);

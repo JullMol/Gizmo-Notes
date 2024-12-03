@@ -105,11 +105,11 @@ def add_task():
             end_time_from_date = datetime.strptime(date + ' ' + end_time_str.strip(), '%Y-%m-%d %I:%M %p')
             
             # Validasi apakah waktu overlap
-            if is_time_overlap(start_time, end_time, tasks):
-                return jsonify({
-                    'status': 'error',
-                    'message': 'Time overlaps with an existing task or break time.'
-                }), 400
+            # if is_time_overlap(start_time, end_time, tasks):
+            #     return jsonify({
+            #         'status': 'error',
+            #         'message': 'Time overlaps with an existing task or break time.'
+            #     }), 400
             
             # Convert times to minutes since midnight
             start_minutes = start_time.hour * 60 + start_time.minute

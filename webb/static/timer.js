@@ -491,21 +491,7 @@ document.addEventListener('DOMContentLoaded', function () {
     saveTimeSlotButton.addEventListener('click', addTimeSlot);
 
     function fetchTasksByDate(date) {
-        fetch(`/data-by-date/${date}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    tasks = data.tasks;
-                    renderTaskList();
-                    fetchNotifications(date);
-                } else {
-                    alert("Gagal mengambil tugas: " + data.message);
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching tasks by date:", error);
-                alert("Terjadi kesalahan saat mengambil tugas.");
-            });
+        fetchTasks(date)
     }
 
     function fetchTasks(date) {
