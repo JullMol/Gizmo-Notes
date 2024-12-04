@@ -55,3 +55,11 @@ class Member(db.Model):
     phone = db.Column(db.String(20), nullable=False)
     role = db.Column(db.String(50), nullable=False)
     created_at = db.Column(db.Date, server_default=db.func.current_date())
+    
+class Schedule(db.Model):
+    __tablename__ = 'schedule'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    date = db.Column(db.Date, nullable=False)
+    subject = db.Column(db.String(50), nullable=False)
+    link = db.Column(db.String, unique=True, nullable=False)
