@@ -32,8 +32,8 @@ class ToDoListA(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     date = db.Column(db.Date, nullable=False)
     time = db.Column(db.Time, nullable=False)
-    placement = db.Column(db.String(50), nullable=False)
-    activities = db.Column(db.String(50), nullable=False)
+    subject = db.Column(db.String(50), nullable=False)
+    details = db.Column(db.String(50), nullable=False)
     priority = db.Column(db.String(50), nullable=False)
 
 class ToDoListE(db.Model):
@@ -42,8 +42,8 @@ class ToDoListE(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     date = db.Column(db.Date, nullable=False)
     time = db.Column(db.Time, nullable=False)
-    placement = db.Column(db.String(50), nullable=False)
-    activities = db.Column(db.String(50), nullable=False)
+    location = db.Column(db.String(50), nullable=False)
+    details = db.Column(db.String(50), nullable=False)
     priority = db.Column(db.String(50), nullable=False)
 
 class Member(db.Model):

@@ -166,9 +166,6 @@ def add_task():
 @timer.route('/start-task/<int:task_id>', methods=['POST'])
 def start_task(task_id):
     global current_task_index
-    """
-    Endpoint untuk memulai timer berdasarkan ID tugas.
-    """
     try:
         sum_timer = Timer.query.count()
         if task_id < 0 and task_id >= sum_timer:
