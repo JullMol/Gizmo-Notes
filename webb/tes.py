@@ -12,6 +12,8 @@ import os
 from fpdf import FPDF
 import csv
 from datetime import datetime
+from database import Member, db
+from flask_sqlalchemy import SQLAlchemy
 
 # Load environment variables
 load_dotenv()
@@ -26,6 +28,10 @@ if not BOT_TOKEN:
 
 # Flask App
 app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local_database.db'  # Ubah sesuai database Anda
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
 
 @app.route("/")
 def home():
@@ -755,6 +761,23 @@ async def end_gp(ctx, *, category_name: str):
         await ctx.send("I don't have permission to delete categories or channels!")
     except discord.HTTPException as e:
         await ctx.send(f"Something error: {e}")
+        
+@bot.command()
+async def get_email(ctx, *, member_name: str):
+    # Mendapatkan username dari pengguna Discord yang menjalankan perintah
+    discord_username = f"{ctx.author.name}"
+    
+    # Gunakan app context untuk query database
+    with app.app_context():
+        # Query untuk mencari email anggota berdasarkan nama
+        member = Member.query.filter_by(name=member_name).first()
+    
+    if member:
+        await ctx.send(f"Hello, {discord_username}!\n"
+                       f"The email for member '{member_name}' is: {member.email}")
+    else:
+        await ctx.send(f"Hello, {discord_username}!\n"
+                       f"No member found with the name '{member_name}'.")
 
 @bot.command()
 async def get_invite(ctx):
