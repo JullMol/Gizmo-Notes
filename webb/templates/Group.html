@@ -67,11 +67,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><input type="text" placeholder="Enter name"></td>
-                        <td><input type="email" placeholder="Enter email"></td>
-                        <td><input type="tel" placeholder="Enter phone"></td>
-                    </tr>
                 </tbody>
             </table>
             <button class="add-row-btn" onclick="addRow('membersTable')">+ Add Member</button>
@@ -91,6 +86,7 @@
                         <td><input type="date"></td>
                         <td><input type="text" placeholder="Enter subject"></td>
                         <td><input type="url" placeholder="Enter link"></td>
+                        <td><button onclick="deleteRow(this)">Delete</button></td>
                     </tr>
                 </tbody>
             </table>

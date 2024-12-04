@@ -99,6 +99,19 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         };
 
+        function deleteRow(row) {
+            const table = row.parentNode.parentNode; // Ambil referensi tabel
+            const tbody = table.querySelector('tbody');
+        
+            // Hapus baris
+            row.remove();
+        
+            // Sembunyikan tabel jika tbody kosong
+            if (!tbody.hasChildNodes()) {
+                table.style.display = 'none';
+            }
+        }        
+
     // Tambahkan event listener pada input kolom link
     tbody1.addEventListener('input', function(event) {
         const target = event.target;
@@ -130,6 +143,11 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('beforeunload', function () {
         localStorage.removeItem('members'); // Menghapus data members di localStorage
     });
+
+    // Sembunyikan tabel jika tidak ada data
+    if (!tbody.hasChildNodes()) {
+        membersTable.style.display = 'none';
+    }
 
     // Ambil data anggota dari backend (Flask)
         fetch('/api/members')
