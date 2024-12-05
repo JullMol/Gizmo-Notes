@@ -784,20 +784,48 @@ async def get_email(ctx, *, member_name: str):
         await ctx.send(f"Hello, {discord_username}!\n"
                        f"No member found with the name '{member_name}'.")
         
-def send_email(recipient_email, subject, message):
-    # Buat pesan email
-    email_message = MIMEMultipart()
+def get_all_emails():
+    with app.app_context():  # Pastikan menggunakan context Flask
+        members = Member.query.all()  # Ambil semua data dari tabel members
+        return [member.email for member in members if member.email]  # Ambil daftar email
+    
+def get_name(email):
+    with app.app_context():
+        member = Member.query.filter_by(email=email).first()
+        if member:
+            return member.name
+        else:
+            return "User"
+        
+def send_email(recipient_email, subject, invite_link):
+    sender_email = os.getenv("GMAIL_EMAIL")
+    sender_password = os.getenv("GMAIL_PASSWORD")
+    
+    recipient_name = get_name(recipient_email)
+
+    # Buka file HTML template
+    with open("D:/PYTHON/Project/Gizmo-Notes/webb/templates/email.html", "r", encoding="utf-8") as file:
+        html_template = file.read()
+
+    # Ganti placeholder dalam template dengan konten dinamis
+    html_message = (
+        html_template.replace("{{name}}", recipient_name)
+        .replace("{{invite_link}}", invite_link)
+    )
+    # Email MIME setup
+    email_message = MIMEMultipart("alternative")
     email_message["From"] = sender_email
     email_message["To"] = recipient_email
     email_message["Subject"] = subject
-    email_message.attach(MIMEText(message, "plain"))
 
-    # Kirim email
+    # Attach HTML message
+    email_message.attach(MIMEText(html_message, "html"))
+
     try:
         with smtplib.SMTP("smtp.gmail.com", 587) as server:
-            server.starttls()  # Enkripsi koneksi
-            server.login(sender_email, sender_password)  # Login ke akun Gmail
-            server.sendmail(sender_email, recipient_email, email_message.as_string())  # Kirim email
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, recipient_email, email_message.as_string())
         print(f"Email sent to {recipient_email}")
         return True
     except Exception as e:
@@ -806,9 +834,17 @@ def send_email(recipient_email, subject, message):
 
 @bot.command()
 @commands.has_role("Admin")  # Hanya admin yang dapat menjalankan perintah ini
-async def email_invite(ctx, channel_name: str, recipient_email: str):
-    guild = ctx.guild
-
+async def email_invite(ctx):
+    # Ambil semua email dari database
+    try:
+        recipient_emails = get_all_emails()
+        if not recipient_emails:
+            await ctx.send("No emails found in the database.")
+            return
+    except Exception as e:
+        await ctx.send(f"An error occurred while fetching emails: {e}")
+        return
+    
     # Ambil link invite dari API
     try:
         response = requests.get(f"{FLASK_SERVER_URL}/api/bot_invite")
@@ -822,28 +858,19 @@ async def email_invite(ctx, channel_name: str, recipient_email: str):
         await ctx.send(f"An error occurred while fetching the invite link: {e}")
         return
 
-    # Temukan channel berdasarkan nama
-    channel = discord.utils.get(guild.text_channels, name=channel_name)
-    if not channel:
-        await ctx.send(f"Channel **{channel_name}** not found!")
-        return
-
-    # Kirim link ke channel Discord
-    try:
-        await channel.send(f"Here is the invite link for the bot: {invite_link}")
-        await ctx.send(f"Invite link successfully sent to channel **{channel_name}**!")
-    except Exception as e:
-        await ctx.send(f"An error occurred while sending to channel: {e}")
-        return
-
-    # Kirim link ke email
+    # Kirim link invite melalui email dengan desain HTML
     subject = "Discord Bot Invite Link"
-    message = f"Hello,\n\nHere is the invite link for the Discord bot:\n{invite_link}\n\nBest regards,\nYour Bot"
-    
-    if send_email(recipient_email, subject, message):
-        await ctx.send(f"Invite link successfully sent to email **{recipient_email}**!")
+    # Kirim email ke setiap penerima
+    failed_emails = []
+    for email in recipient_emails:
+        if not send_email(email, subject, invite_link):  # Gunakan send_email_with_template
+            failed_emails.append(email)
+
+    # Kirim notifikasi ke channel Discord
+    if failed_emails:
+        await ctx.send(f"Failed to send emails to the following addresses: {', '.join(failed_emails)}")
     else:
-        await ctx.send(f"Failed to send invite link to email **{recipient_email}**. Please check the logs.")
+        await ctx.send("Invite links successfully sent to all emails!")
 
 # Run the bot
 bot.run(BOT_TOKEN)
