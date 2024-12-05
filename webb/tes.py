@@ -14,6 +14,9 @@ import csv
 from datetime import datetime
 from database import Member, db
 from flask_sqlalchemy import SQLAlchemy
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 # Load environment variables
 load_dotenv()
@@ -22,6 +25,8 @@ FLASK_SERVER_URL = os.getenv("FLASK_SERVER_URL")
 FLASK_API_URL = os.getenv("FLASK_API_URL")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 personal_bot = os.getenv("personal_bot_link")
+sender_email = os.getenv("GMAIL_EMAIL")  # Masukkan email pengirim di file .env
+sender_password = os.getenv("GMAIL_PASSWORD")  # Masukkan password Gmail di file .env
 
 if not BOT_TOKEN:
     raise ValueError("Bot token is missing! Please check your .env file.")
@@ -778,18 +783,67 @@ async def get_email(ctx, *, member_name: str):
     else:
         await ctx.send(f"Hello, {discord_username}!\n"
                        f"No member found with the name '{member_name}'.")
+        
+def send_email(recipient_email, subject, message):
+    # Buat pesan email
+    email_message = MIMEMultipart()
+    email_message["From"] = sender_email
+    email_message["To"] = recipient_email
+    email_message["Subject"] = subject
+    email_message.attach(MIMEText(message, "plain"))
+
+    # Kirim email
+    try:
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()  # Enkripsi koneksi
+            server.login(sender_email, sender_password)  # Login ke akun Gmail
+            server.sendmail(sender_email, recipient_email, email_message.as_string())  # Kirim email
+        print(f"Email sent to {recipient_email}")
+        return True
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        return False
 
 @bot.command()
-async def get_invite(ctx):
+@commands.has_role("Admin")  # Hanya admin yang dapat menjalankan perintah ini
+async def email_invite(ctx, channel_name: str, recipient_email: str):
+    guild = ctx.guild
+
+    # Ambil link invite dari API
     try:
-        response = requests.get(f"{FLASK_SERVER_URL}/invite-bot")
+        response = requests.get(f"{FLASK_SERVER_URL}/api/bot_invite")
         if response.status_code == 200:
             invite = response.json()
-            await ctx.send(f"Here is your invite link: {invite['invite_link']}")
+            invite_link = invite.get("invite_link", "No invite link found.")
         else:
-            await ctx.send("Failed to get invite link.")
+            await ctx.send("Failed to retrieve invite link from the server.")
+            return
     except Exception as e:
-        await ctx.send(f"Error: {e}")
+        await ctx.send(f"An error occurred while fetching the invite link: {e}")
+        return
+
+    # Temukan channel berdasarkan nama
+    channel = discord.utils.get(guild.text_channels, name=channel_name)
+    if not channel:
+        await ctx.send(f"Channel **{channel_name}** not found!")
+        return
+
+    # Kirim link ke channel Discord
+    try:
+        await channel.send(f"Here is the invite link for the bot: {invite_link}")
+        await ctx.send(f"Invite link successfully sent to channel **{channel_name}**!")
+    except Exception as e:
+        await ctx.send(f"An error occurred while sending to channel: {e}")
+        return
+
+    # Kirim link ke email
+    subject = "Discord Bot Invite Link"
+    message = f"Hello,\n\nHere is the invite link for the Discord bot:\n{invite_link}\n\nBest regards,\nYour Bot"
+    
+    if send_email(recipient_email, subject, message):
+        await ctx.send(f"Invite link successfully sent to email **{recipient_email}**!")
+    else:
+        await ctx.send(f"Failed to send invite link to email **{recipient_email}**. Please check the logs.")
 
 # Run the bot
 bot.run(BOT_TOKEN)
