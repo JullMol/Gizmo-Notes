@@ -63,3 +63,11 @@ class Schedule(db.Model):
     date = db.Column(db.Date, nullable=False)
     subject = db.Column(db.String(50), nullable=False)
     link = db.Column(db.String, unique=True, nullable=False)
+    
+class Record(db.Model):
+    __tablename__ = 'record'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    channel_type = db.Column(db.String(50), nullable=False)
+    channel_name = db.Column(db.String(100), nullable=False)
+    link = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())

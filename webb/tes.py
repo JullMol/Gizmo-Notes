@@ -12,7 +12,7 @@ import os
 from fpdf import FPDF
 import csv
 from datetime import datetime
-from database import Member, db
+from database import Member, Record, db
 from flask_sqlalchemy import SQLAlchemy
 import smtplib
 from email.mime.text import MIMEText
@@ -25,8 +25,8 @@ FLASK_SERVER_URL = os.getenv("FLASK_SERVER_URL")
 FLASK_API_URL = os.getenv("FLASK_API_URL")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 personal_bot = os.getenv("personal_bot_link")
-sender_email = os.getenv("GMAIL_EMAIL")  # Masukkan email pengirim di file .env
-sender_password = os.getenv("GMAIL_PASSWORD")  # Masukkan password Gmail di file .env
+sender_email = os.getenv("GMAIL_EMAIL")
+sender_password = os.getenv("GMAIL_PASSWORD")
 
 if not BOT_TOKEN:
     raise ValueError("Bot token is missing! Please check your .env file.")
@@ -34,7 +34,7 @@ if not BOT_TOKEN:
 # Flask App
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local_database.db'  # Ubah sesuai database Anda
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local_database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
@@ -73,7 +73,7 @@ def bot_invite():
 @bot.event
 async def on_member_update(before, after):
     guild = after.guild
-    channel_name = "bot_testing"  # Ganti dengan nama channel yang ingin Anda bersihkan
+    channel_name = "bot_testing"
 
     # Temukan channel bot_testing
     channel = discord.utils.get(guild.text_channels, name=channel_name)
@@ -135,20 +135,21 @@ async def hello(ctx):
 async def ping(ctx):
     await ctx.send(
         "Hello! I am your personal bot. Here are the commands you can use:\n"
-        "1. !ping: Test bot\n"
+        "1. !get_email <member_name> : Get email about member\n"
         "2. !create_gp <category_name> : Create default category and channel\n"
         "3. !add_gp <category_name> <channel_name> : Add channel to category\n"
-        "4. !role : View role\n"
-        "5. !pick_role <role_name> : Select role\n"
-        "6. !change_role <@Username> <role_name> : Change role other member if you are Admin\n"
-        "7. !add_meet <category _name> <voice_channel_name> : Create voice channel\n"
-        "8. !start_text <category_name> <channel_name> : Record activity in text channel\n"
-        "9. !stop_text <category_name> <channel_name> : Stop recording text channel\n"
-        "10. !convert_and_upload <channel_name> : Convert csv files record to pdf and upload to AnonFiles\n"
-        "11. !start_voice <category_name> <voice_channel_name> : Record activity in voice channel\n"
-        "13. !stop_voice <category_name> <voice_channel_name> : Stop recording voice channel\n"
-        "12. !end_gp : <category_name> : Delete \n"
-        "13. !clear : Clear history"
+        "4. !add_meet <category _name> <voice_channel_name> : Create voice channel\n"
+        "5. !email_invite : Send email invitation to all members\n"
+        "6. !role : View role\n"
+        "7. !pick_role <role_name> : Select role\n"
+        "8. !change_role <@Username> <role_name> : Change role other member if you are Admin\n"
+        "9. !start_text <category_name> <channel_name> : Record activity in text channel\n"
+        "11. !stop_text <category_name> <channel_name> : Stop recording text channel\n"
+        "12. !convert_and_upload <channel_name> : Convert csv files record to pdf and upload to AnonFiles\n"
+        "13. !start_voice <category_name> <voice_channel_name> : Record activity in voice channel\n"
+        "14. !stop_voice <category_name> <voice_channel_name> : Stop recording voice channel\n"
+        "15. !end_gp : <category_name> : Delete \n"
+        "16. !clear : Clear history"
     )
     
 @bot.command()
