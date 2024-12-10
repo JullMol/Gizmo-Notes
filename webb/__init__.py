@@ -16,11 +16,17 @@ def create_app():
     from .group import group
     from .todo import todo
     from .invite import invite
+    from .goals import goals
+    from .project import project
+    from .calendar import calendar
     app.register_blueprint(home)
     app.register_blueprint(timer)
     app.register_blueprint(group)
     app.register_blueprint(todo)
     app.register_blueprint(invite)
+    app.register_blueprint(goals)
+    app.register_blueprint(project)
+    app.register_blueprint(calendar)
     
     create_base(app)
     return app

@@ -73,6 +73,9 @@ def save_day_task():
 def save_assignment_task():
     data = request.get_json()
     assignment_tasks.append(data)
+
+    # save disini
+
     print(f"Assignment Task: {assignment_tasks}")
     return jsonify({"status": "success", "tasks": assignment_tasks})
 

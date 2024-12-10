@@ -111,14 +111,23 @@ function updateDateDisplay() {
 }
 
 // Chart update functions
-async function updateDailyChart() {
-    const dateKey = getDateKey(selectedDate);
+async function updateDailyChart(dt = null) {
+    d = dt ? dt : selectedDate
+
+    // console.log(d)
+    const dateKey = getDateKey(d);
     // if (!dateData.has(dateKey)) {
     // }
-    dateData.set(dateKey, await getData(dateKey));
+    // dateData.set(dateKey, await getData(dateKey));
+
+    for (i = 1; i <= 4; i++) {
+        dt_ = new Date()
+        dt_.setDate(selectedDate.getDate() - 1 * i)
+        dateData.set(dateKey, await getData(dateKey));
+    }
+
     updateStudyChart()
     const data = dateData.get(dateKey);
-    console.log(data)
 
     const chartData = {
         labels: ['Others', 'Project Group', 'Study', 'Exercise'],
@@ -166,7 +175,7 @@ async function updateStudyChart() {
         const dateKey = getDateKey(date);
         
         if (!dateData.has(dateKey)) {
-            dateData.set(dateKey, getData(dateKey));
+            dateData.set(dateKey, await getData(dateKey));
         }
         
         const dayData = dateData.get(dateKey);
@@ -251,5 +260,10 @@ document.getElementById('nextDay').addEventListener('click', async () => {
 // Initial setup
 setInterval(updateTime, 1000);
 updateDateDisplay();
-updateDailyChart();
-updateStudyChart();
+updateDailyChart()
+// for (i = 1; i <= 4; i++) {
+//     dt_ = new Date()
+//     dt_.setDate(selectedDate.getDate() - 1 * i)
+//     updateDailyChart(dt_);
+// }
+// updateStudyChart();

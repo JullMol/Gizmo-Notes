@@ -55,17 +55,25 @@ function renderTaskList() {
 
     sortedTasks.forEach((task, index) => {
         const row = document.createElement('tr');
-        row.innerHTML = `
+        a = `
             <td>${task.startTime} - ${task.endTime}</td>
             <td>${task.description}</td>
             <td>${task.status || 'pending'}</td>
+        `;
+
+        if (task.status != 'completed') {
+            a += `
             <td>
                 <button onclick="startTask(${task.id})" 
                         ${task.status === 'running' ? 'disabled' : ''}>
                     Start
                 </button>
             </td>
-        `;
+            `
+        }
+
+        row.innerHTML = a
+
         taskTableBody.appendChild(row);
     });
 }
@@ -117,7 +125,6 @@ document.addEventListener('DOMContentLoaded', function () {
     let remainingTime = 0;
     let timerRunning = false;
     let timer;
-    let tasks = [];
     let taskDuration = [];
     let currentTaskIndex = 0;
     let breakTime = 5 * 60; // 5 menit break time
@@ -138,22 +145,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Di dalam event listener DOMContentLoaded
     window.startTask = function(taskId) {
+        console.log(taskId)
         fetch(`/start-task/${taskId}`, {method:'POST'})
         .then(response => response.json())
         .then(data => {
+            console.log(data.status)
+            console.log(tasks)
             if (data.status === 'success') {
                 // Update status tugas di frontend
-                tasks = tasks.map(task => 
-                    task.id === taskId 
-                        ? {...task, status: 'running'} 
-                        : {...task, status: task.status === 'running' ? 'pending' : task.status}
-                );
+                tasks_ = data.tasks
+                tasks = tasks_.map((task) => {
+                    console.log(task.id, taskId)
+                    if (task.id == taskId ) {
+                        task.status = 'running'
+                    } else {
+                        task.status === 'running' ? 'pending' : task.status
+                    }
+
+                    return task
+                });
                 
                 // Perbarui tampilan
                 renderTaskList();
                 
                 // Jalankan timer untuk tugas spesifik
-                const currentTask = tasks.find(task => task.id === taskId);
+                const currentTask = tasks.find((task) => task.id === taskId);
                 if (currentTask) {
                     startTimer(currentTask.duration * 60);
                 }
@@ -344,9 +360,9 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('/reset-task', { method: 'POST' })
             .then(response => response.json())
             .then(data => {
-                if (data.status === 'success') {
-                    fetchTasks(); // Perbarui daftar tugas
-                }
+                let currentDate_ = formatDate(new Date().toLocaleDateString())
+                console.log(currentDate_)
+                fetchTasks(currentDate_); // Perbarui daftar tugas
             });
     });
 

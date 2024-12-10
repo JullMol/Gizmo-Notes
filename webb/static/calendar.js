@@ -1,5 +1,6 @@
 let waktutertentu = new Date();
 let selectedDates = {};
+selDate = `${waktutertentu.getFullYear()}-${waktutertentu.getMonth()}-${("0" + waktutertentu.getDay()).slice(-2)}`
 let sessions = [
     { id: 1, name: 'Grocery Shop', color: '#60a5fa' },
     { id: 2, name: 'Meeting', color: '#f472b6' },
@@ -29,7 +30,7 @@ function initCalendar() {
         dayElement.textContent = day;
         dayElement.classList.add('day');
                 
-        const dateString = `${waktutertentu.getFullYear()}-${waktutertentu.getMonth()}-${day}`;
+        const dateString = `${waktutertentu.getFullYear()}-${waktutertentu.getMonth()}-${("0" + waktutertentu.getDay()).slice(-2)}`;
         if (selectedDates[dateString]) {
             const session = sessions.find(s => s.id === selectedDates[dateString]);
             if (session) {
@@ -50,26 +51,40 @@ function initCalendar() {
     updateSessionList();
 }
 
-function updateSessionList() {
+async function updateSessionList() {
     const sessionList = document.getElementById('sessionList');
     sessionList.innerHTML = '';
-            
-    sessions.forEach(session => {
-        const sessionElement = document.createElement('div');
-        sessionElement.className = 'session-type';
-        if (session.id === currentSessionId) {
-            sessionElement.classList.add('selected-session');
-        }
-                
-        sessionElement.innerHTML = `
-        <div class="session-indicator" style="background-color: ${session.color}"></div>
-        <span>${session.name}</span>
-        <button class="delete-btn" onclick="deleteSession(${session.id})">×</button>
-        `;
-                
-        sessionElement.addEventListener('click', () => selectSession(session.id));
-        sessionList.appendChild(sessionElement);
-    });
+
+    all = await fetch('/getcalendar')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Fetched tasks:', data); // Debug
+            project = data.tasks; // Simpan daftar tugas
+            // console.log(tasks)
+            // renderTaskList(); // Render tugas di tabel
+
+            project.forEach(i => {
+                const sessionElement = document.createElement('div');
+                sessionElement.className = 'session-type';
+                if (i.id === currentSessionId) {
+                    sessionElement.classList.add('selected-session');
+                }
+                        
+                sessionElement.innerHTML = `
+                <div class="session-indicator" style="background-color: ${i.colour}"></div>
+                <span>${i.name}</span>
+                <button class="delete-btn" onclick="deleteSession(${i.id})">×</button>
+                `;
+                        
+                sessionElement.addEventListener('click', () => selectSession(session.id));
+                // sessionList.appendChild(sessionElement);
+
+                console.log(i.dt, selDate)
+                if (i.dt == selDate) {
+                    sessionList.appendChild(sessionElement);
+                }
+            });
+        })
 }
 
 function showAddSessionForm() {
@@ -92,6 +107,21 @@ function saveSession() {
         name: name,
         color: color
         });
+
+        fetch('/calendar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name : name,
+                colour : color,
+                tanggal : selDate,
+            })
+        }).then(() => {
+            window.location.reload()
+        })
+
         cancelSessionForm();
         updateSessionList();
     }
@@ -120,7 +150,8 @@ function selectSession(id) {
 }
 
 function toggleDate(day) {
-    const dateString = `${waktutertentu.getFullYear()}-${waktutertentu.getMonth()}-${day}`;
+    const dateString = `${waktutertentu.getFullYear()}-${waktutertentu.getMonth()}-${("0" + day).slice(-2)}`;
+    selDate = dateString
     if (selectedDates[dateString] === currentSessionId) {
         delete selectedDates[dateString];
     } else {

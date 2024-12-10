@@ -192,23 +192,51 @@ def start_task(task_id):
     Endpoint untuk memulai timer berdasarkan ID tugas.
     """
     try:
-        if task_id < 0 or task_id >= len(tasks):
-            return jsonify({
-                'status': 'error',
-                'message': 'Invalid task ID'
-            }), 400
+        # if task_id < 0 or task_id >= len(tasks):
+        #     return jsonify({
+        #         'status': 'error',
+        #         'message': 'Invalid task ID'
+        #     }), 400
             
-        if current_task_index is not None:
-            tasks[current_task_index]['status'] = 'completed'
+        # if current_task_index is not None:
+        #     tasks[current_task_index]['status'] = 'completed'
 
-        task = tasks[task_id]
-        task['status'] = 'running'
-        current_task_index = task_id
+        # task = tasks[task_id]
+        # task['status'] = 'running'
+        # current_task_index = task_id
+
+        # get from db
+        task_ = Timer.query.get_or_404(task_id)
+
+        # edit status
+        task_.status = 'running'
+
+        # save to db
+        db.session.add(task_)
+        db.session.commit()
+
+        # get from db
+        tasks_ = Timer.query.filter_by(date=task_.date).all()
+        print(tasks_, flush=True)
+
+        res = []
+        schema = TimerSchema(many=True)
+        for task in schema.dump(tasks_):
+            # convert start_time to %I:%M %p format
+            start = datetime.strptime(task['start_time'], '%Y-%m-%dT%H:%M:%S')
+            end = datetime.strptime(task['end_time'], '%Y-%m-%dT%H:%M:%S')
+            task['start_time'] = datetime.strftime(start, '%I:%M %p')
+            task['end_time'] = datetime.strftime(end, '%I:%M %p')
+            if task['status'] != 'running':
+                res.append({**task, 'startable': True, 'startTime': task['start_time'], 'endTime': task['end_time'], 'description': task['task']})
+            else:
+                res.append({**task, 'startable': False, 'startTime': task['start_time'], 'endTime': task['end_time'], 'description': task['task']})
 
         return jsonify({
             'status': 'success',
-            'duration': task['duration'],
-            'message': f'Timer started for task: {task["description"]}'
+            'duration': task_.duration,
+            'message': f'Timer started for task: {task_.task}',
+            'tasks': res
         })
 
     except Exception as e:
@@ -277,6 +305,25 @@ def get_tasks():
         return jsonify({'status': 'success', 'tasks': res}), 200
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@timer.route('/reset-task', methods=['POST'])
+def reset_task():
+    timer_ = Timer.query.filter_by(status='running').all()
+    schema = TimerSchema(many=True)
+
+    # change all to completed
+    for task in schema.dump(timer_):
+        task_ = Timer.query.filter_by(id=task['id']).first()
+        task_.status = 'completed'
+
+        # save
+        db.session.add(task_)
+        db.session.commit()
+    
+    return jsonify({
+        'status': 'success',
+        'message': 'Timer reset'
+    })
     
 @timer.route('/all-data', methods=['GET'])
 def get_all_data():
@@ -383,18 +430,6 @@ def get_notifications(date):
         return jsonify({'status': 'success', 'notifications': notifications}), 200
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
-
-@timer.route('/reset-task', methods=['POST'])
-def reset_task():
-    global tasks, current_task_index
-    if current_task_index is not None:
-        tasks[current_task_index]['status'] = 'completed'
-        current_task_index = None
-    
-    return jsonify({
-        'status': 'success',
-        'message': 'Timer reset'
-    })
 
 if __name__ == '__main__':
     timer.run(debug=True)
