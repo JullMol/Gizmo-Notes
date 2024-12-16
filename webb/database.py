@@ -10,8 +10,9 @@ class Timer(db.Model):
     __tablename__ = 'timers'
     
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    start_time = db.Column(db.DateTime, nullable=False)
-    end_time = db.Column(db.DateTime, nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    start_time = db.Column(db.Time, nullable=False)
+    end_time = db.Column(db.Time, nullable=False)
     task = db.Column(db.String(255), nullable=False)
     status = db.Column(db.String(50), nullable=False)
     duration = db.Column(db.Integer, nullable=False)
@@ -90,8 +91,8 @@ class ToDoListA(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     date = db.Column(db.Date, nullable=False)
     time = db.Column(db.Time, nullable=False)
-    placement = db.Column(db.String(50), nullable=False)
-    activities = db.Column(db.String(50), nullable=False)
+    subject = db.Column(db.String(50), nullable=False)
+    details = db.Column(db.String(50), nullable=False)
     priority = db.Column(db.String(50), nullable=False)
 
 class ToDoListE(db.Model):
@@ -100,8 +101,8 @@ class ToDoListE(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     date = db.Column(db.Date, nullable=False)
     time = db.Column(db.Time, nullable=False)
-    placement = db.Column(db.String(50), nullable=False)
-    activities = db.Column(db.String(50), nullable=False)
+    location = db.Column(db.String(50), nullable=False)
+    details = db.Column(db.String(50), nullable=False)
     priority = db.Column(db.String(50), nullable=False)
 
 class Member(db.Model):
@@ -112,4 +113,20 @@ class Member(db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     phone = db.Column(db.String(20), nullable=False)
     role = db.Column(db.String(50), nullable=False)
-    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    created_at = db.Column(db.Date, server_default=db.func.current_date())
+    
+class Schedule(db.Model):
+    __tablename__ = 'schedule'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    date = db.Column(db.Date, nullable=False)
+    subject = db.Column(db.String(50), nullable=False)
+    link = db.Column(db.String, unique=True, nullable=False)
+    
+class Record(db.Model):
+    __tablename__ = 'record'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    channel_type = db.Column(db.String(50), nullable=False)
+    channel_name = db.Column(db.String(100), nullable=False)
+    link = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())

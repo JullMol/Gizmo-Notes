@@ -1,4 +1,6 @@
 from flask import Flask, render_template, Blueprint, jsonify, request
+from .database import db, Schedule
+from datetime import datetime
 import requests
 from dotenv import load_dotenv
 import os
@@ -120,26 +122,72 @@ def add_schedule():
     try:
         # Ambil data schedule dari request
         schedule_data = request.json
-        schedule_data['id'] = str(uuid.uuid4())  # Tambahkan ID unik
         
-        # Tambahkan schedule ke list
-        schedules.append(schedule_data)
+        if not schedule_data.get('date') or not schedule_data.get('subject') or not schedule_data.get('link'):
+            return jsonify({"error": "All fields (date, subject, link) are required!"}), 400
+        
+        try:
+            date_s = datetime.strptime(schedule_data['date'], '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({"error": "Invalid date format!"}), 400
+            
+        new_schedule = Schedule(
+            date=date_s,
+            subject=schedule_data['subject'],
+            link=schedule_data['link']
+        )
+        
+        db.session.add(new_schedule)
+        db.session.commit()
         
         # Kembalikan respons sukses
-        return jsonify({"message": "Schedule added successfully", "schedule": schedule_data}), 200
+        return jsonify({
+            "message": "Schedule added successfully",
+            "schedule": {
+                "id": new_schedule.id,
+                "date": new_schedule.date,
+                "subject": new_schedule.subject,
+                "link": new_schedule.link
+            }
+        }), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 @group.route('/api/get_schedules', methods=['GET'])
 def get_schedules():
-    return jsonify(schedules)
+    try:
+        # Query semua jadwal dari database
+        all_schedules = Schedule.query.all()
+
+        # Format data untuk dikembalikan
+        schedules_list = [
+            {
+                "id": schedule.id,
+                "date": schedule.date,
+                "subject": schedule.subject,
+                "link": schedule.link
+            }
+            for schedule in all_schedules
+        ]
+
+        return jsonify(schedules_list), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @group.route('/api/schedules/<string:schedule_id>', methods=['DELETE'])
 def delete_schedule(schedule_id):
     global schedules
     try:
         # Cari jadwal berdasarkan ID
-        schedules = [schedule for schedule in schedules if schedule.get('id') != schedule_id]
+        schedule_to_delete = Schedule.query.get(schedule_id)
+
+        if not schedule_to_delete:
+            return jsonify({"error": "Schedule not found"}), 404
+
+        # Hapus dari database
+        db.session.delete(schedule_to_delete)
+        db.session.commit()
+
         return jsonify({"message": "Schedule deleted successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500

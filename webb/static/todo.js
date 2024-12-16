@@ -172,6 +172,47 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Gagal menyimpan tugas');
         });
     }
+
+    // Ambil data dari backend
+    fetch('/get_day_tasks')
+        .then(response => response.json())
+        .then(tasks => {
+            const taskTableBody = document.querySelector('#taskTable tbody'); // Pastikan ID sesuai
+            taskTableBody.innerHTML = ''; // Kosongkan tabel sebelum mengisi data baru
+
+            tasks.forEach(task => {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td>${task.date}</td>
+                    <td>${task.time}</td>
+                    <td>${task.placement}</td>
+                    <td>${task.activities}</td>
+                    <td>${task.priority}</td>
+                    <td><button class="deleteButton" data-id="${task.id}">Delete</button></td>
+                `;
+                taskTableBody.appendChild(newRow);
+
+                // Tambahkan event listener untuk tombol delete
+                const deleteButton = newRow.querySelector('.deleteButton');
+                deleteButton.addEventListener('click', function() {
+                    const taskId = deleteButton.dataset.id; // Ambil ID dari atribut data-id
+                    if (confirm('Are you sure you want to delete this task?')) {
+                        fetch(`/get_day_tasks?id=${taskId}`, {
+                            method: 'DELETE',
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                newRow.remove(); // Hapus baris dari tabel
+                            } else {
+                                alert('Failed to delete task');
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                    }
+                });
+            });
+        })
+        .catch(error => console.error('Error fetching tasks:', error));
     
     // Panggil fungsi untuk menginisialisasi Day View
     initializeDayView();
@@ -261,6 +302,47 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Gagal menyimpan tugas');
         });
     }
+
+    // Ambil data dari backend
+    fetch('/get_assignment_tasks')
+        .then(response => response.json())
+        .then(tasks => {
+            const taskTableBody = document.querySelector('#assignmentTable tbody'); // Pastikan ID sesuai
+            taskTableBody.innerHTML = ''; // Kosongkan tabel sebelum mengisi data baru
+
+            tasks.forEach(task => {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td>${task.date}</td>
+                    <td>${task.time}</td>
+                    <td>${task.subject}</td>
+                    <td>${task.details}</td>
+                    <td>${task.priority}</td>
+                    <td><button class="deleteButton" data-id="${task.id}">Delete</button></td>
+                `;
+                taskTableBody.appendChild(newRow);
+
+                // Tambahkan event listener untuk tombol delete
+                const deleteButton = newRow.querySelector('.deleteButton');
+                deleteButton.addEventListener('click', function() {
+                    const taskId = deleteButton.dataset.id; // Ambil ID dari atribut data-id
+                    if (confirm('Are you sure you want to delete this task?')) {
+                        fetch(`/get_assignment_tasks?id=${taskId}`, {
+                            method: 'DELETE',
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                newRow.remove(); // Hapus baris dari tabel
+                            } else {
+                                alert('Failed to delete task');
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                    }
+                });
+            });
+        })
+        .catch(error => console.error('Error fetching tasks:', error));
     
     // Panggil fungsi untuk menginisialisasi Assignment View
     initializeAssignmentView();
@@ -350,6 +432,47 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Gagal menyimpan tugas');
         });
     }
+
+    // Ambil data dari backend
+    fetch('/get_event_tasks')
+        .then(response => response.json())
+        .then(tasks => {
+            const taskTableBody = document.querySelector('#eventTable tbody'); // Pastikan ID sesuai
+            taskTableBody.innerHTML = ''; // Kosongkan tabel sebelum mengisi data baru
+
+            tasks.forEach(task => {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td>${task.date}</td>
+                    <td>${task.time}</td>
+                    <td>${task.location}</td>
+                    <td>${task.details}</td>
+                    <td>${task.priority}</td>
+                    <td><button class="deleteButton" data-id="${task.id}">Delete</button></td>
+                `;
+                taskTableBody.appendChild(newRow);
+
+                // Tambahkan event listener untuk tombol delete
+                const deleteButton = newRow.querySelector('.deleteButton');
+                deleteButton.addEventListener('click', function() {
+                    const taskId = deleteButton.dataset.id; // Ambil ID dari atribut data-id
+                    if (confirm('Are you sure you want to delete this task?')) {
+                        fetch(`/get_event_tasks?id=${taskId}`, {
+                            method: 'DELETE',
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                newRow.remove(); // Hapus baris dari tabel
+                            } else {
+                                alert('Failed to delete task');
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                    }
+                });
+            });
+        })
+        .catch(error => console.error('Error fetching tasks:', error));
     
     // Panggil fungsi untuk menginisialisasi Event View
     initializeEventView();

@@ -12,6 +12,11 @@ import os
 from fpdf import FPDF
 import csv
 from datetime import datetime
+from database import Member, Record, db
+from flask_sqlalchemy import SQLAlchemy
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 # Load environment variables
 load_dotenv()
@@ -20,12 +25,18 @@ FLASK_SERVER_URL = os.getenv("FLASK_SERVER_URL")
 FLASK_API_URL = os.getenv("FLASK_API_URL")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 personal_bot = os.getenv("personal_bot_link")
+sender_email = os.getenv("GMAIL_EMAIL")
+sender_password = os.getenv("GMAIL_PASSWORD")
 
 if not BOT_TOKEN:
     raise ValueError("Bot token is missing! Please check your .env file.")
 
 # Flask App
 app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local_database.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
 
 @app.route("/")
 def home():
@@ -62,7 +73,7 @@ def bot_invite():
 @bot.event
 async def on_member_update(before, after):
     guild = after.guild
-    channel_name = "bot_testing"  # Ganti dengan nama channel yang ingin Anda bersihkan
+    channel_name = "bot_testing"
 
     # Temukan channel bot_testing
     channel = discord.utils.get(guild.text_channels, name=channel_name)
@@ -124,20 +135,21 @@ async def hello(ctx):
 async def ping(ctx):
     await ctx.send(
         "Hello! I am your personal bot. Here are the commands you can use:\n"
-        "1. !ping: Test bot\n"
+        "1. !get_email <member_name> : Get email about member\n"
         "2. !create_gp <category_name> : Create default category and channel\n"
         "3. !add_gp <category_name> <channel_name> : Add channel to category\n"
-        "4. !role : View role\n"
-        "5. !pick_role <role_name> : Select role\n"
-        "6. !change_role <@Username> <role_name> : Change role other member if you are Admin\n"
-        "7. !add_meet <category _name> <voice_channel_name> : Create voice channel\n"
-        "8. !start_text <category_name> <channel_name> : Record activity in text channel\n"
-        "9. !stop_text <category_name> <channel_name> : Stop recording text channel\n"
-        "10. !convert_and_upload <channel_name> : Convert csv files record to pdf and upload to AnonFiles\n"
-        "11. !start_voice <category_name> <voice_channel_name> : Record activity in voice channel\n"
-        "13. !stop_voice <category_name> <voice_channel_name> : Stop recording voice channel\n"
-        "12. !end_gp : <category_name> : Delete \n"
-        "13. !clear : Clear history"
+        "4. !add_meet <category _name> <voice_channel_name> : Create voice channel\n"
+        "5. !email_invite : Send email invitation to all members\n"
+        "6. !role : View role\n"
+        "7. !pick_role <role_name> : Select role\n"
+        "8. !change_role <@Username> <role_name> : Change role other member if you are Admin\n"
+        "9. !start_text <category_name> <channel_name> : Record activity in text channel\n"
+        "11. !stop_text <category_name> <channel_name> : Stop recording text channel\n"
+        "12. !convert_and_upload <channel_name> : Convert csv files record to pdf and upload to AnonFiles\n"
+        "13. !start_voice <category_name> <voice_channel_name> : Record activity in voice channel\n"
+        "14. !stop_voice <category_name> <voice_channel_name> : Stop recording voice channel\n"
+        "15. !end_gp : <category_name> : Delete \n"
+        "16. !clear : Clear history"
     )
     
 @bot.command()
@@ -755,18 +767,111 @@ async def end_gp(ctx, *, category_name: str):
         await ctx.send("I don't have permission to delete categories or channels!")
     except discord.HTTPException as e:
         await ctx.send(f"Something error: {e}")
+        
+@bot.command()
+async def get_email(ctx, *, member_name: str):
+    # Mendapatkan username dari pengguna Discord yang menjalankan perintah
+    discord_username = f"{ctx.author.name}"
+    
+    # Gunakan app context untuk query database
+    with app.app_context():
+        # Query untuk mencari email anggota berdasarkan nama
+        member = Member.query.filter_by(name=member_name).first()
+    
+    if member:
+        await ctx.send(f"Hello, {discord_username}!\n"
+                       f"The email for member '{member_name}' is: {member.email}")
+    else:
+        await ctx.send(f"Hello, {discord_username}!\n"
+                       f"No member found with the name '{member_name}'.")
+        
+def get_all_emails():
+    with app.app_context():  # Pastikan menggunakan context Flask
+        members = Member.query.all()  # Ambil semua data dari tabel members
+        return [member.email for member in members if member.email]  # Ambil daftar email
+    
+def get_name(email):
+    with app.app_context():
+        member = Member.query.filter_by(email=email).first()
+        if member:
+            return member.name
+        else:
+            return "User"
+        
+def send_email(recipient_email, subject, invite_link):
+    sender_email = os.getenv("GMAIL_EMAIL")
+    sender_password = os.getenv("GMAIL_PASSWORD")
+    
+    recipient_name = get_name(recipient_email)
+
+    # Buka file HTML template
+    with open("D:/PYTHON/Project/Gizmo-Notes/webb/templates/email.html", "r", encoding="utf-8") as file:
+        html_template = file.read()
+
+    # Ganti placeholder dalam template dengan konten dinamis
+    html_message = (
+        html_template.replace("{{name}}", recipient_name)
+        .replace("{{invite_link}}", invite_link)
+    )
+    # Email MIME setup
+    email_message = MIMEMultipart("alternative")
+    email_message["From"] = sender_email
+    email_message["To"] = recipient_email
+    email_message["Subject"] = subject
+
+    # Attach HTML message
+    email_message.attach(MIMEText(html_message, "html"))
+
+    try:
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, recipient_email, email_message.as_string())
+        print(f"Email sent to {recipient_email}")
+        return True
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        return False
 
 @bot.command()
-async def get_invite(ctx):
+@commands.has_role("Admin")  # Hanya admin yang dapat menjalankan perintah ini
+async def email_invite(ctx):
+    # Ambil semua email dari database
     try:
-        response = requests.get(f"{FLASK_SERVER_URL}/invite-bot")
+        recipient_emails = get_all_emails()
+        if not recipient_emails:
+            await ctx.send("No emails found in the database.")
+            return
+    except Exception as e:
+        await ctx.send(f"An error occurred while fetching emails: {e}")
+        return
+    
+    # Ambil link invite dari API
+    try:
+        response = requests.get(f"{FLASK_SERVER_URL}/api/bot_invite")
         if response.status_code == 200:
             invite = response.json()
-            await ctx.send(f"Here is your invite link: {invite['invite_link']}")
+            invite_link = invite.get("invite_link", "No invite link found.")
         else:
-            await ctx.send("Failed to get invite link.")
+            await ctx.send("Failed to retrieve invite link from the server.")
+            return
     except Exception as e:
-        await ctx.send(f"Error: {e}")
+        await ctx.send(f"An error occurred while fetching the invite link: {e}")
+        return
+
+    # Kirim link invite melalui email dengan desain HTML
+    subject = "Discord Bot Invite Link"
+    # Kirim email ke setiap penerima
+    failed_emails = []
+    for email in recipient_emails:
+        if not send_email(email, subject, invite_link):  # Gunakan send_email_with_template
+            failed_emails.append(email)
+
+    # Kirim notifikasi ke channel Discord
+    if failed_emails:
+        await ctx.send(f"Failed to send emails to the following addresses: {', '.join(failed_emails)}")
+    else:
+        await ctx.send("Invite links successfully sent to all emails!")
 
 # Run the bot
 bot.run(BOT_TOKEN)

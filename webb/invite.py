@@ -1,5 +1,5 @@
 from flask import Flask, render_template, Blueprint, request, jsonify
-
+from .database import db, Member
 invite = Blueprint('invite', __name__)
 
 members = {}
@@ -58,35 +58,51 @@ def Calendar():
 
 @invite.route('/Invite.html')
 def discord():
+    
     return render_template('Invite.html')
 
 @invite.route('/api/members/<name_member>', methods=['GET'])
 @invite.route('/api/members/', methods=['GET'])
 def get_members(name_member=None):
+    all_member = Member.query.all()
+    members_data = {}
+    for member in all_member:
+        print(member.name)
+        members_data[member.name] = {
+        'name': member.name,
+        'email': member.email,
+        'phone': member.phone,
+        'role': member.role
+        }
     if name_member is not None:
-        if members[name_member]:
-            del members[name_member]
-    return jsonify(members)
+        member = Member.query.filter_by(name=name_member).first()
+        if member:
+            db.session.delete(member)
+            db.session.commit()
+    return jsonify(members_data)
 
 @invite.route('/invite', methods=['POST'])
-def dc():
-    # Menerima data JSON yang dikirim oleh invite.js
+def invite_member():
     data = request.get_json()
-
-    # Cek apakah semua data diperlukan ada
-    if 'name' not in data or 'email' not in data or 'phone' not in data or 'role' not in data:
-        return jsonify({'error': 'Missing data'}), 400
-
-    # Simpan data anggota ke dalam list di memori
-    member_data = {
-        'name': data['name'],
-        'email': data['email'],
-        'phone': data['phone'],
-        'role': data['role']
-    }
-
-    members[data.get('name')] = member_data  # Menambahkan ke list members
-    print(members)
-    return jsonify({'message': 'Member added successfully!'}), 201
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+    
+    name = data.get('name')
+    email = data.get('email')
+    phone = data.get('phone')
+    role = data.get('role')
+    
+    if not all([name, email, phone, role]):
+        return jsonify({'message': 'All fields are required'}), 400
+    
+    new_member = Member(name=name, email=email, phone=phone, role=role)
+    try:
+        db.session.add(new_member)
+        db.session.commit()
+        return jsonify({'message': 'Member invited successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'Error adding member', 'error': str(e)})
+    
 if __name__ == '__main__':
     invite.run(debug=True)

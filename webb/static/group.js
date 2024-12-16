@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });    
 
     addSchBtn.addEventListener('click', function() {
+        saveData();
         const newRow1 = tbody1.insertRow();  // Menambahkan baris baru ke tabel
 
         const dateCell = newRow1.insertCell(0);
@@ -55,7 +56,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
             }
         });
-        let isValid = true;
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Delete';
         deleteButton.addEventListener('click', function () {
@@ -63,6 +63,54 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         actionCell.appendChild(deleteButton);
     })
+        // Saat data diinput, langsung disimpan ke backend
+        function saveData(){
+            const all_row = tbody1.querySelectorAll('tr')
+            all_row.forEach((row)=>{
+                const scheduleData = {
+                    date: row.cells[0].querySelector('input').value,
+                    subject: row.cells[1].querySelector('input').value,
+                    link: row.cells[2].querySelector('input').value
+                };
+                console.log(`date: ${scheduleData.date}, subject: ${scheduleData.subject}, link: ${scheduleData.link}`);
+                console.log(scheduleData)
+                if (!scheduleData.date || !scheduleData.subject || !scheduleData.link) {
+                    alert('All fields are required!');
+                    return;
+                }
+                fetch('/api/add_schedule', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(scheduleData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to save schedule');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(data.message);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to save the schedule.');
+                });
+            });
+        };
+
+        function deleteRow(row) {
+            const table = row.parentNode.parentNode; // Ambil referensi tabel
+            const tbody = table.querySelector('tbody');
+        
+            // Hapus baris
+            row.remove();
+        
+            // Sembunyikan tabel jika tbody kosong
+            if (!tbody.hasChildNodes()) {
+                table.style.display = 'none';
+            }
+        }        
 
     // Tambahkan event listener pada input kolom link
     tbody1.addEventListener('input', function(event) {
@@ -95,6 +143,11 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('beforeunload', function () {
         localStorage.removeItem('members'); // Menghapus data members di localStorage
     });
+
+    // Sembunyikan tabel jika tidak ada data
+    if (!tbody.hasChildNodes()) {
+        membersTable.style.display = 'none';
+    }
 
     // Ambil data anggota dari backend (Flask)
         fetch('/api/members')
@@ -140,35 +193,4 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error fetching members:', error);
             alert('There was an error fetching the members.');
         });
-
-    if (isValid) {
-        const scheduleData = {
-            date: dateCell,
-            subject: subjectCell,
-            link: linkCell
-        };
-        console.log('Schedule Data:', scheduleData)
-
-        fetch('/api/add_schedule', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(scheduleData)
-        })
-        .then(response => {
-            if (!response.ok) { // Jika status bukan 2xx, maka ada error
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            alert(data.message);  // Menampilkan pesan sukses dari backend
-            resetForm();  // Reset form setelah sukses
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('There was an error adding the member.');
-        });
-    }
 })
