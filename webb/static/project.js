@@ -51,7 +51,7 @@ function renderList(projectName, sessionTime, timeCreated, timeFinished) {
     }
 
     const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'delete-btn';
+    deleteBtn.className = 'delete-btn1';
     deleteBtn.innerHTML = 'Delete';
     deleteBtn.onclick = function() {
         table.deleteRow(row.rowIndex);

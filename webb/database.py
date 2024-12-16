@@ -64,15 +64,16 @@ class ccalendar(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name =  db.Column(db.String, nullable=False)
     colour = db.Column(db.String, nullable=False)
-    date = db.Column(db.Date, nullable=False)
+    date = db.Column(db.JSON)
 
-class ccalendarSchema(Schema):
-    id = fields.Integer(dump_only=True)
-    name = fields.String()
-    colour = fields.String()
-    date = fields.Date()
-
+class notes_data(db.Model):
+    __tablename__ = 'notesD'
     
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    hari =  db.Column(db.String, nullable=False)
+    content = db.Column(db.Text)
+    photo = db.Column(db.JSON)
+
 class ToDoListD(db.Model):
     __tablename__ = 'todo_listsD'
     

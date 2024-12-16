@@ -19,6 +19,7 @@ def create_app():
     from .goals import goals
     from .project import project
     from .calendar import calendar
+    from .notes import notes
     app.register_blueprint(home)
     app.register_blueprint(timer)
     app.register_blueprint(group)
@@ -27,6 +28,7 @@ def create_app():
     app.register_blueprint(goals)
     app.register_blueprint(project)
     app.register_blueprint(calendar)
+    app.register_blueprint(notes)
     
     create_base(app)
     return app

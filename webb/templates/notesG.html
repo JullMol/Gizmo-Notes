@@ -68,7 +68,20 @@
                     <div class="saved-notes-grouped" id="group3Notes"></div>
                 </div>
             </div>
+            <div class="note-table">
+                <table id="tabel-content">
+                    <thead>
+                        <tr>
+                            <th>Hari</th>
+                            <th>Isi note</th>
+                            <th>Foto</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
+        
 
         <div class="create-note-modal" style="display: none;">
             <div class="modal-content">
@@ -78,6 +91,8 @@
                 <button class="save-note-btn">Save Note</button>
                 <button class="close-modal-btn">Close</button>
             </div>
+        </div>
+        <div class="create-note-modal" id="image-show"  style="display: none;">
         </div>
         <script src="{{url_for('static', filename='notes.js')}}"></script>
     </body>
