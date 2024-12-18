@@ -1,3 +1,89 @@
+var tasks = []
+
+function fetchTasks(date = null) {
+    url = '/tasks'
+    if (date) {
+        url += '?date=' + date
+    }
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Fetched tasks:', data); // Debug
+            tasks = data.tasks; // Simpan daftar tugas
+            console.log(tasks)
+            renderTaskList(); // Render tugas di tabel
+        })
+        .catch(error => {
+            console.error('Error fetching tasks:', error);
+            alert('Failed to load tasks');
+        });
+}
+
+function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+    return [year, month, day].join('-');
+}
+
+function renderTaskList() {
+    const taskTableBody = document.querySelector('.time-management-table-body');
+    taskTableBody.innerHTML = ''; // Kosongkan tabel sebelum diperbarui
+
+    // Urutkan tugas berdasarkan waktu mulai
+    const sortedTasks = tasks.sort((a, b) => {
+        // Parsing waktu dengan benar
+        const parseTime = (timeStr) => {
+            const [time, period] = timeStr.split(' ');
+            let [hours, minutes] = time.split(':').map(Number);
+            
+            if (period === 'PM' && hours !== 12) hours += 12;
+            if (period === 'AM' && hours === 12) hours = 0;
+            
+            return hours * 60 + minutes;
+        };
+
+        return parseTime(a.startTime) - parseTime(b.startTime);
+    });
+
+    sortedTasks.forEach((task, index) => {
+        const row = document.createElement('tr');
+        a = `
+            <td>${task.startTime} - ${task.endTime}</td>
+            <td>${task.description}</td>
+            <td>${task.status || 'pending'}</td>
+        `;
+
+        if (task.status != 'completed') {
+            a += `
+            <td>
+                <button onclick="startTask(${task.id})" 
+                        ${task.status === 'running' ? 'disabled' : ''}>
+                    Start
+                </button>
+            </td>
+            `
+        }
+
+        row.innerHTML = a
+
+        taskTableBody.appendChild(row);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    date = new Date()
+    dte = formatDate(date)
+    fetchTasks(dte); // Ambil daftar tugas dari server
+});    
+
 document.addEventListener('DOMContentLoaded', function () {
     const timerView = document.getElementById('timerView');
     const timerLink = document.getElementById('timerLink');
@@ -39,7 +125,6 @@ document.addEventListener('DOMContentLoaded', function () {
     let remainingTime = 0;
     let timerRunning = false;
     let timer;
-    let tasks = [];
     let taskDuration = [];
     let currentTaskIndex = 0;
     let breakTime = 5 * 60; // 5 menit break time
@@ -49,20 +134,6 @@ document.addEventListener('DOMContentLoaded', function () {
     createGoals.addEventListener('click', function () {
         window.location.href = '/page-goals';
     });
-
-    function fetchTasks() {
-        fetch('/tasks')
-            .then(response => response.json())
-            .then(data => {
-                console.log('Fetched tasks:', data); // Debug
-                tasks = data; // Simpan daftar tugas
-                renderTaskList(); // Render tugas di tabel
-            })
-            .catch(error => {
-                console.error('Error fetching tasks:', error);
-                alert('Failed to load tasks');
-            });
-    }
 
     // Fungsi Timer
     function updateTimerDisplay(timeInSeconds) {
@@ -74,22 +145,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Di dalam event listener DOMContentLoaded
     window.startTask = function(taskId) {
+        console.log(taskId)
         fetch(`/start-task/${taskId}`, {method:'POST'})
         .then(response => response.json())
         .then(data => {
+            console.log(data.status)
+            console.log(tasks)
             if (data.status === 'success') {
                 // Update status tugas di frontend
-                tasks = tasks.map(task => 
-                    task.id === taskId 
-                        ? {...task, status: 'running'} 
-                        : {...task, status: task.status === 'running' ? 'pending' : task.status}
-                );
+                tasks_ = data.tasks
+                tasks = tasks_.map((task) => {
+                    console.log(task.id, taskId)
+                    if (task.id == taskId ) {
+                        task.status = 'running'
+                    } else {
+                        task.status === 'running' ? 'pending' : task.status
+                    }
+
+                    return task
+                });
                 
                 // Perbarui tampilan
                 renderTaskList();
                 
                 // Jalankan timer untuk tugas spesifik
-                const currentTask = tasks.find(task => task.id === taskId);
+                const currentTask = tasks.find((task) => task.id === taskId);
                 if (currentTask) {
                     startTimer(currentTask.duration * 60);
                 }
@@ -107,42 +187,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     };
 
-    function renderTaskList() {
-        const taskTableBody = document.querySelector('.time-management-table-body');
-        taskTableBody.innerHTML = ''; // Kosongkan tabel sebelum diperbarui
     
-        // Urutkan tugas berdasarkan waktu mulai
-        const sortedTasks = tasks.sort((a, b) => {
-            // Parsing waktu dengan benar
-            const parseTime = (timeStr) => {
-                const [time, period] = timeStr.split(' ');
-                let [hours, minutes] = time.split(':').map(Number);
-                
-                if (period === 'PM' && hours !== 12) hours += 12;
-                if (period === 'AM' && hours === 12) hours = 0;
-                
-                return hours * 60 + minutes;
-            };
-    
-            return parseTime(a.startTime) - parseTime(b.startTime);
-        });
-    
-        sortedTasks.forEach((task, index) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${task.startTime} - ${task.endTime}</td>
-                <td>${task.description}</td>
-                <td>${task.status || 'pending'}</td>
-                <td>
-                    <button onclick="startTask(${task.id})" 
-                            ${task.status === 'running' ? 'disabled' : ''}>
-                        Start
-                    </button>
-                </td>
-            `;
-            taskTableBody.appendChild(row);
-        });
-    }
 
     function autoProgressTasks() {
         let currentTaskIndex = 0;
@@ -294,10 +339,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 1000);
     }    
     
-    document.addEventListener('DOMContentLoaded', function () {
-        fetchTasks(); // Ambil daftar tugas dari server
-    });    
-    
     // Tombol untuk memulai tugas saat ini
     playButton.addEventListener('click', function () {
         if (currentTaskIndex < taskDurations.length) {
@@ -319,9 +360,9 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('/reset-task', { method: 'POST' })
             .then(response => response.json())
             .then(data => {
-                if (data.status === 'success') {
-                    fetchTasks(); // Perbarui daftar tugas
-                }
+                let currentDate_ = formatDate(new Date().toLocaleDateString())
+                console.log(currentDate_)
+                fetchTasks(currentDate_); // Perbarui daftar tugas
             });
     });
 
@@ -376,7 +417,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     taskDescription: task,
                     startTime: formattedStartTime,
                     endTime: formattedEndTime,
-                    date: selectedDate.toISOString().split('T')[0]
+                    date: selDate
                 })
             })
             .then(response => {
@@ -467,40 +508,12 @@ document.addEventListener('DOMContentLoaded', function () {
     saveTimeSlotButton.addEventListener('click', addTimeSlot);
 
     function fetchTasksByDate(date) {
-        fetch(`/data-by-date/${date}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    tasks = data.tasks;
-                    renderTaskList();
-                    fetchNotifications(date);
-                } else {
-                    alert("Gagal mengambil tugas: " + data.message);
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching tasks by date:", error);
-                alert("Terjadi kesalahan saat mengambil tugas.");
-            });
+        fetchTasks(date)
     }
 
-    function fetchTasks(date) {
-        const url = date ? `/tasks?date=${date}` : '/tasks';
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    tasks = data.tasks;
-                    renderTaskList();
-                } else {
-                    alert('Gagal mengambil tugas: ' + data.message);
-                }
-            })
-            .catch(error => console.error('Error fetching tasks:', error));
-    }  
-
     // Fungsi Kalender
-    let selectedDate = new Date();  
+    let selectedDate = new Date(); 
+    let selDate =  new Date().toISOString().split('T')[0]
 
     function renderCalendar(date) {
         const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -537,6 +550,8 @@ document.addEventListener('DOMContentLoaded', function () {
             dayCell.addEventListener('click', () => {
                 selectedDate = new Date(date.getFullYear(), date.getMonth(), i);
                 const formattedDate = selectedDate.toISOString().split('T')[0];
+                dateMinusOneDay = new Date(selectedDate.getTime() + (86400 * 1000)).toISOString().split('T')[0]
+                selDate = dateMinusOneDay
                 currentDate.textContent = selectedDate.toLocaleDateString('default', {
                     weekday: 'short',
                     month: 'short',
@@ -544,7 +559,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
                 datePicker.classList.remove('active');
                 renderCalendar(selectedDate);
-                fetchTasksByDate(formattedDate);
+                // fetchTasksByDate(formattedDate);
+                fetchTasks(dateMinusOneDay)
                 fetchGoalsByDate(formattedDate);
             });
 
