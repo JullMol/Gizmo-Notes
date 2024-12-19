@@ -1,12 +1,15 @@
 let waktutertentu = new Date();
 let selectedDates = {};
-let sessions = [];
+let sessions = [
+    { id: 1, name: 'Grocery Shop', color: '#60a5fa' },
+    { id: 2, name: 'Meeting', color: '#f472b6' },
+    { id: 3, name: 'Lunch', color: '#9ca3af' }
+];
 
 let currentSessionId = 1;
-// let nextSessionId = 2;
+let nextSessionId = 4;
 
-async function initCalendar() {
-    await updateSessionList();
+function initCalendar() {
     const calendar = document.getElementById('calendar');
     const monthDisplay = document.getElementById('monthDisplay');
             
@@ -20,13 +23,13 @@ async function initCalendar() {
     for (let i = 0; i < firstDay.getDay(); i++) {
         calendar.appendChild(document.createElement('div'));
     }
-    
+            
     for (let day = 1; day <= lastDay.getDate(); day++) {
         const dayElement = document.createElement('div');
         dayElement.textContent = day;
         dayElement.classList.add('day');
                 
-        const dateString = `${waktutertentu.getFullYear()}-${waktutertentu.getMonth()}-${("0" + day).slice(-2)}`;
+        const dateString = `${waktutertentu.getFullYear()}-${waktutertentu.getMonth()}-${day}`;
         if (selectedDates[dateString]) {
             const session = sessions.find(s => s.id === selectedDates[dateString]);
             if (session) {
@@ -44,44 +47,29 @@ async function initCalendar() {
         calendar.appendChild(dayElement);
     }
 
+    updateSessionList();
 }
 
-async function updateSessionList() {
+function updateSessionList() {
     const sessionList = document.getElementById('sessionList');
     sessionList.innerHTML = '';
-    sessions = []
-    all = await fetch('/getcalendar')
-        .then(response => response.json())
-        .then(data => {
-            project = data.tasks; // Simpan daftar tugas
-            // console.log(tasks)
-            // renderTaskList(); // Render tugas di tabel
-
-            project.forEach(i => {
-                const sessionElement = document.createElement('div');
-                sessionElement.className = 'session-type';
-                if (i.id === currentSessionId) { 
-                    sessionElement.classList.add('selected-session'); 
-                } 
             
-                sessionElement.innerHTML = `
-                    <div class="session-indicator" style="background-color: ${i.colour}"></div>
-                    <span>${i.name}</span>
-                    <button class="delete-btn" onclick="deleteSession(${i.id})">×</button>
-                `;
-            
-                sessionElement.addEventListener('click', () => selectSession(i.id)); // Menggunakan `i.id`
-                sessionList.appendChild(sessionElement);
-                if (i.date){
-                    i.date.forEach(tgl => selectedDates[tgl]=i.id)
-                }
-                sessions.push({
-                    'id': i.id,
-                    'name': i.name,
-                    'color': i.colour
-                });
-            });
-        })
+    sessions.forEach(session => {
+        const sessionElement = document.createElement('div');
+        sessionElement.className = 'session-type';
+        if (session.id === currentSessionId) {
+            sessionElement.classList.add('selected-session');
+        }
+                
+        sessionElement.innerHTML = `
+        <div class="session-indicator" style="background-color: ${session.color}"></div>
+        <span>${session.name}</span>
+        <button class="delete-btn" onclick="deleteSession(${session.id})">×</button>
+        `;
+                
+        sessionElement.addEventListener('click', () => selectSession(session.id));
+        sessionList.appendChild(sessionElement);
+    });
 }
 
 function showAddSessionForm() {
@@ -94,83 +82,51 @@ function cancelSessionForm() {
     document.getElementById('sessionForm').style.display = 'none';
 }
 
-function saveSession(select=false) {
+function saveSession() {
     const name = document.getElementById('sessionName').value.trim();
     const color = document.getElementById('sessionColor').value;
-    const date = {};
-    console.log(selectedDates)
-    if (select){
-        Object.entries(selectedDates).forEach(([tgl, id]) =>{
-            if(!date[id]){
-                date[id] = [];
-            }
-            date[id].push(tgl);
-        })
-    }
+            
     if (name) {
-        fetch('/calendar', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                name : name,
-                colour : color,
-                tanggal : date
-            })
-        }).then(response => response.json())
-        .then(data => {
-            if(data.success){
-                initCalendar();
-                if(data.save){
-                    window.location.reload()
-                }else{
-                    return;
-                }
-            }
-            alert(data.message);
-        })
-
+        sessions.push({
+        id: nextSessionId++,
+        name: name,
+        color: color
+        });
         cancelSessionForm();
+        updateSessionList();
     }
 }
 
 function deleteSession(id) {
-    Object.keys(selectedDates).forEach(key => {
-        if (selectedDates[key] === id) {
-            delete selectedDates[key];
-        }
-    });
-    if (sessions.length > 0) {
-        fetch(`/delete-session/${id}`)
-        .then(response => response.json())
-        .then(data => {
-            if(data.success){
-                initCalendar();
+    event.stopPropagation();
+    if (sessions.length > 1) {
+        sessions = sessions.filter(s => s.id !== id);
+            if (currentSessionId === id) {
+                currentSessionId = sessions[0].id;
             }
-            alert(data.message);
-        })
+            // Remove deleted session from dates
+            for (let dateStr in selectedDates) {
+                if (selectedDates[dateStr] === id) {
+                    delete selectedDates[dateStr];
+                }
+            }
+            initCalendar();
     }
 }
 
 function selectSession(id) {
     currentSessionId = id;
-    initCalendar();
+    updateSessionList();
 }
 
 function toggleDate(day) {
-    console.log(selectedDates)
-    const dateString = `${waktutertentu.getFullYear()}-${waktutertentu.getMonth()}-${("0" + day).slice(-2)}`;
+    const dateString = `${waktutertentu.getFullYear()}-${waktutertentu.getMonth()}-${day}`;
     if (selectedDates[dateString] === currentSessionId) {
-        if (Object.values(selectedDates).filter(value => value === currentSessionId).length < 2){
-            alert("You can't change this without choose another date");
-            return;
-        }
         delete selectedDates[dateString];
     } else {
         selectedDates[dateString] = currentSessionId;
     }
-    saveSession(true);
+    initCalendar();
 }
 
 function prevMonth() {

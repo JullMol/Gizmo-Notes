@@ -58,6 +58,19 @@
                 <div class="note-card">
                     <img src="{{url_for('static', filename='Monday.jpg')}}" alt="Monday Notes" class="note-image" data-day="Monday">
                 </div>
+                <div class="saved-notes" id="mondayNotes">
+                    <table class="notes-table">
+                        <thead>
+                            <tr>
+                                <th class="notes-title">Title</th>
+                                <th class="notes-content">Content</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Catatan hari Senin akan ditampilkan di sini -->
+                        </tbody>
+                    </table>
+                </div>
                 <div class="note-card">
                     <img src="{{url_for('static', filename='Tuesday.jpg')}}" alt="Tuesday Notes" class="note-image" data-day="Tuesday">
                     <div class="saved-notes" id="tuesdayNotes"></div>
@@ -83,18 +96,6 @@
                     <div class="saved-notes" id="sundayNotes"></div>
                 </div>
             </div>
-            <div class="note-table">
-                <table id="tabel-content">
-                    <thead>
-                        <tr>
-                            <th>Hari</th>
-                            <th>Isi note</th>
-                            <th>Foto</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
         </div>
         
         <!-- Modal untuk membuat catatan -->
@@ -106,8 +107,6 @@
                 <button class="save-note-btn">Save Note</button>
                 <button class="close-modal-btn">Close</button>
             </div>
-        </div>
-        <div class="create-note-modal" id="image-show"  style="display: none;">
         </div>
         <script src="{{url_for('static', filename='notes.js')}}"></script>
     </body>
