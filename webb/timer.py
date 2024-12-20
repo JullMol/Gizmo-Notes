@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template, Blueprint, jsonify
 from datetime import datetime, timedelta
 import time
-from .database import Timer, db
+from .database import Timer, db, GGoals
 
 timer = Blueprint('timer', __name__)
 
@@ -201,9 +201,20 @@ def get_data_by_date(date):
         datetime.strptime(date, '%Y-%m-%d')
 
         # Ambil tugas berdasarkan tanggal
-        tasks = tasks_by_date.get(date, [])
-        goals = goals_by_date.get(date, [])
-        return jsonify({'status': 'success', 'tasks': tasks, 'goals': goals}), 200
+        tasks = Timer.query.filter_by(date=datetime.strptime(date, "%Y-%m-%d").date()).all()
+        result = [
+            {
+                'id': task.id,
+                'description': task.task,
+                'startTime': task.start_time.strftime('%I:%M %p'),
+                'endTime': task.end_time.strftime('%I:%M %p'),
+                'date': task.date.strftime('%Y-%m-%d'),
+                'duration': task.duration,
+                'startable': task.status != 'running'
+            }
+            for task in tasks
+        ]
+        return jsonify({'status': 'success', 'tasks': result}), 200
 
     except ValueError:
         return jsonify({'status': 'error', 'message': 'Invalid date format'}), 400
