@@ -121,7 +121,6 @@ body {
 }
 
 .timer-view {
-    display: none;
     margin-left: 240px;
     height: 100vh;
     background-color: #1a1f37;

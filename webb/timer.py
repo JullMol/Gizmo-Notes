@@ -216,9 +216,9 @@ def get_tasks():
     try:
         # Ambil parameter tanggal (jika ada)
         date = request.args.get('date')
-        
+        print(date)
         if date:
-            tasks = Timer.query.filter_by(date=datetime.strptime(date, "%Y-%m-%d").time()).all()
+            tasks = Timer.query.filter_by(date=datetime.strptime(date, "%Y-%m-%d").date()).all()
         else:
             # Gabungkan semua task jika tidak ada tanggal yang diberikan
             # tasks = [task for tasks in tasks_by_date.values() for task in tasks]

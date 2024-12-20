@@ -15,6 +15,39 @@ class Timer(db.Model):
     task = db.Column(db.String(255), nullable=False)
     status = db.Column(db.String(50), nullable=False)
     duration = db.Column(db.Integer, nullable=False)
+
+class GGoals(db.Model):
+    __tablename__ = 'goals'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    your_goals = db.Column(db.String, nullable=False)
+    session = db.Column(db.String, nullable=False)
+    time_to_achieve_goals = db.Column(db.Date, nullable=False)
+
+class pproject(db.Model):
+    __tablename__ = 'project'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    project_name = db.Column(db.String, nullable=False)
+    session2 = db.Column(db.String, nullable=False)
+    time_created = db.Column(db.DateTime, nullable=False)
+    time_finished = db.Column(db.DateTime, nullable=False)
+
+class ccalendar(db.Model):
+    __tablename__ = 'calendar'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name =  db.Column(db.String, nullable=False)
+    colour = db.Column(db.String, nullable=False)
+    date = db.Column(db.JSON)
+
+class notes_data(db.Model):
+    __tablename__ = 'notesD'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    hari =  db.Column(db.String, nullable=False)
+    content = db.Column(db.Text)
+    photo = db.Column(db.JSON)
     
 class ToDoListD(db.Model):
     __tablename__ = 'todo_listsD'
