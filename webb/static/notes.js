@@ -1,30 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const notesDView = document.getElementById('notesDView');
-    const notesGView = document.getElementById('notesGView');
-
     const noteImages = document.querySelectorAll('.note-image');
     const noteImagesGrouped = document.querySelectorAll('.note-image-grouped');
     const createNoteModal = document.querySelector('.create-note-modal');
     const closeModalBtn = document.querySelector('.close-modal-btn');
     const saveNoteBtn = document.querySelector('.save-note-btn');
-    const noteTextarea = document.querySelector('.note-textarea');
     const modalTitle = document.querySelector('.modal-title'); // Ambil elemen judul modal
-
-    function showView(viewToShow) {
-        notesDView.style.display = 'none';
-        notesGView.style.display = 'none';
-        viewToShow.style.display = 'block';
-    };
-
-    notesDLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        showView(notesDView);
-    });
-
-    notesGLink.addEventListener('click', function(e){
-        e.preventDefault();
-        showView(notesGView);
-    });
+    const delete_content = document.querySelectorAll('.delete-btn2');
+    const note = document.querySelector('.note-editor')
 
     // Menangani klik pada gambar catatan
     noteImages.forEach(image => {
@@ -105,33 +87,124 @@ document.addEventListener('DOMContentLoaded', function() {
     // Menangani klik tombol close
     closeModalBtn.addEventListener('click', function() {
         createNoteModal.style.display = 'none'; // Sembunyikan modal
-        noteTextarea.value = ''; // Kosongkan textarea
+        note.value = ''; // Kosongkan textarea
     });
+
+    // function add_notesContent(){
+    //     table = contentnote.insertRow();
+
+    // }
 
     // Menangani klik tombol save (tambahkan logika penyimpanan di sini)
     saveNoteBtn.addEventListener('click', function() {
-        alert('Note saved'); // Ganti dengan logika penyimpanan yang sesuai
-        createNoteModal.style.display = 'none'; // Sembunyikan modal setelah menyimpan
-        document.querySelector('.note-editor').innerHTML = ''; // Kosongkan editor
-        
-        const noteContent = noteTextarea.value; // Ambil konten catatan
+        const photo = note.querySelectorAll('img');
         fetch('/save_note', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ note: noteContent }), // Kirim konten catatan sebagai JSON
+        body: JSON.stringify({ "day": modalTitle.textContent.split(' ')[1],
+            "content" : note.textContent,
+            "photolist": Array.from(photo).map( pho => pho.src)
+         }), // Kirim konten catatan sebagai JSON
         })
         .then(response => response.json())
         .then(data => {
         if (data.success) {
-            alert('Note saved and PDF generated');
+            alert(data.message);
             createNoteModal.style.display = 'none'; // Sembunyikan modal setelah menyimpan
-            document.querySelector('.note-editor').innerHTML = ''; // Kosongkan editor
+            note.innerHTML = ''; // Kosongkan editor
+            renderList();
         } else {
-            alert('Error saving note');
+            alert(data.message);
         }
         });
 
     });
+    renderList()
+    async function renderList() {
+        const response = await fetch('/get_notes')
+        const data_notes = await response.json()
+        const contentnote = document.getElementById('tabel-content')
+        data_notes.forEach((data_note) =>{
+            const row = contentnote.insertRow();
+            const hari = row.insertCell(0);
+            const isinote = row.insertCell(1);
+            const photo = row.insertCell(2);
+            const actionCell = row.insertCell(3);
+            
+        hari.innerHTML = data_note.day;
+        isinote.innerHTML = data_note.content;
+        data_note.photolist.forEach(img_src => {
+            const photo_btn = document.createElement('button')
+            const img_btn = document.createElement('img');
+            img_btn.src = img_src;
+            img_btn.style.width = '24px';
+            img_btn.style.height = '24px';
+            photo_btn.appendChild(img_btn);
+            photo_btn.onclick = () =>{
+                const modal = document.getElementById('image-show');
+                modal.innerHTML = ''
+                const image = document.createElement('img')
+                image.src = img_src; 
+                modal.appendChild(image);
+                modal.style.display = "flex";
+                const close_btn = document.createElement('button')
+                close_btn.innerHTML = '&nbsp;X&nbsp;';
+                close_btn.onclick = () =>{
+                    modal.style.display = "none";
+                }
+                modal.appendChild(close_btn);
+            }
+            photo.appendChild(photo_btn);
+        });
+    
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn2';
+        deleteBtn.innerText = 'Delete';
+        deleteBtn.onclick = () => {
+            fetch(`delete_note/${data_note.id}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success){
+                    alert(data.message);
+                    contentnote.deleteRow(row.rowIndex);
+                }else{
+                    alert(data.message);
+                }
+            })
+        };
+        actionCell.appendChild(deleteBtn);
+        })
+    }
 })
+
+
+// function addProject() {
+//     const nama_Notes = document.getElementById('nama_Notes').value;
+//     const Notesnya = document.getElementById('Notesnya').value;
+    
+
+//     if (nama_Notes && Notesnya) {
+//         // save
+//         fetch('/saveproject', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             },
+//             body: JSON.stringify({
+//                 // nama harus sesuai dengan di py nya
+//                 projekname : projectName,
+//                 session2 : sessionTime,
+//             })
+//         }).then(() => {
+//             window.location.reload()
+//         })
+
+//         // Reset input form
+//         document.getElementById('nama_Notes').value= '';
+//         document.getElementById('Notesnya').value= '';
+//     } else {
+//         alert('Please fill in all fields');
+//     }
+// }

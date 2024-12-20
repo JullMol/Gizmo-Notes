@@ -226,6 +226,19 @@ class GoalsTracker {
                 timeToAchieve: timeText
             };
 
+            fetch('/savegoals', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    goalss : goalText,
+                    session : sessionText,
+                    timeachieve : timeText,
+                })
+            })
+
+
             this.goals.unshift(newGoal);
             this.saveGoals();
             this.renderGoals();

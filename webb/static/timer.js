@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const timerView = document.getElementById('timerView');
-    const timerLink = document.getElementById('timerLink');
+
     // Ambil elemen-elemen DOM yang dibutuhkan
     const timeDisplay = document.querySelector('.time span');
     const playButton = document.querySelector('.play-button');
@@ -18,15 +17,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const calendarMonthYear = document.querySelector('.calendar-month-year');
     const calendarGrid = document.querySelector('.calendar-grid');
 
-    function showView(viewToShow) {
-        timerView.style.display = 'none';
-        viewToShow.style.display = 'block';
-    }
-
-    timerLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        showView(timerView);
-    });
 
     // Validasi elemen yang harus ada
     if (!timeDisplay || !playButton || !resetButton || !timeManagementTableBody || !taskInput || 
@@ -376,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     taskDescription: task,
                     startTime: formattedStartTime,
                     endTime: formattedEndTime,
-                    date: selectedDate.toISOString().split('T')[0]
+                    date: selectedDate.toLocaleDateString('en-CA')
                 })
             })
             .then(response => {
@@ -536,12 +526,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
             dayCell.addEventListener('click', () => {
                 selectedDate = new Date(date.getFullYear(), date.getMonth(), i);
-                const formattedDate = selectedDate.toISOString().split('T')[0];
+                const formattedDate = selectedDate.toLocaleDateString('en-CA');
                 currentDate.textContent = selectedDate.toLocaleDateString('default', {
                     weekday: 'short',
                     month: 'short',
                     day: 'numeric',
                 });
+                console.log(`formatted date: ${formattedDate} \n selected date: ${selectedDate}`);
                 datePicker.classList.remove('active');
                 renderCalendar(selectedDate);
                 fetchTasksByDate(formattedDate);
