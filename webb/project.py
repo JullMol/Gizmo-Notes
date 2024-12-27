@@ -1,69 +1,14 @@
 from flask import  Flask , render_template, request, redirect, url_for, Blueprint, jsonify
 from .database import db, pproject
 from datetime import datetime
+from flask_login import login_required, current_user
 
 project = Blueprint("project", __name__)
 
 project_list = []
 
-
-@project.route('/')
-def index():
-    return render_template('home.html')
-
-@project.route('/home.html')
-def menu():
-    return render_template('home.html')
-
-@project.route('/search.html')
-def search():
-    return render_template('search.html')
-
-@project.route('/timer.html')
-def pomo():
-    return render_template('timer.html')
-
-@project.route('/notesD.html')
-def notesD():
-    return render_template('notesD.html')
-
-@project.route('/notesG.html')
-def notesG():
-    return render_template('notesG.html')
-
-@project.route('/Day.html')
-def Day():
-    return render_template('Day.html')
-
-@project.route('/Assignment.html')
-def Assignment():
-    return render_template('Assignment.html')
-
-@project.route('/Event.html')
-def Event():
-    return render_template('Event.html')
-
-@project.route('/Reports.html')
-def Reports():
-    return render_template('Reports.html')
-
-@project.route('/Goals.html')
-def Goals():
-    return render_template('Goals.html')
-
-@project.route('/Group.html')
-def Group():
-    return render_template('Group.html')
-
-@project.route('/Calendar.html')
-def Calendar():
-    return render_template('Calendar.html')
-
-@project.route('/Invite.html')
-def invite():
-    return render_template('Invite.html')
-
 @project.route('/saveproject', methods=['POST'])
+@login_required
 def Saveproject():
     data = request.get_json()
     tm = data.get('timeCreated')
@@ -71,6 +16,7 @@ def Saveproject():
     tm1 = data.get('timeFinished')
     tm1_ = datetime.strptime(tm, '%Y-%m-%dT%H:%M')
     project_table = pproject(
+        user_id=current_user.id,
         project_name=data.get('projekname'),
         session2=data.get('session2'),
         time_created=tm_,
@@ -83,8 +29,9 @@ def Saveproject():
     return jsonify({'status': 'success', 'message': 'Task added successfully'}), 200
 
 @project.route('/getproject', methods=['GET'])
+@login_required
 def getproject():
-    tasks_ = pproject.query.all()  # Fetch all projects
+    tasks_ = pproject.query.filter_by(user_id=current_user.id).all()  # Fetch all projects
     res = []
 
     # Loop through each task and manually format the time fields

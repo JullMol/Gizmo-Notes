@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, Blueprint, jsonify
 from datetime import datetime, timedelta
 import time
 from .database import Timer, db, GGoals
+from flask_login import login_required, current_user
 
 timer = Blueprint('timer', __name__)
 
@@ -10,71 +11,8 @@ tasks_by_date = {}
 goals_by_date = {}
 current_task_index = None
 
-@timer.route('/')
-def index():
-    return render_template('home.html')
-
-@timer.route('/home.html')
-def home():
-    return render_template('home.html')
-
-@timer.route('/search.html')
-def search():
-    return render_template('search.html')
-
-@timer.route('/timer.html')
-def pomo():
-    return render_template('timer.html')
-
-@timer.route('/notesD.html')
-def notesD():
-    return render_template('notesD.html')
-
-@timer.route('/notesG.html')
-def notesG():
-    return render_template('notesG.html')
-
-@timer.route('/Day.html')
-def Day():
-    return render_template('Day.html')
-
-@timer.route('/Assignment.html')
-def Assignment():
-    return render_template('Assignment.html')
-
-@timer.route('/Event.html')
-def Event():
-    return render_template('Event.html')
-
-@timer.route('/Reports.html')
-def Reports():
-    return render_template('Reports.html')
-
-@timer.route('/Goals.html')
-def Goals():
-    return render_template('Goals.html')
-
-@timer.route('/Group.html')
-def Group():
-    return render_template('Group.html')
-
-@timer.route('/Calendar.html')
-def Calendar():
-    return render_template('Calendar.html')
-
-@timer.route('/Project.html')
-def Project():
-    return render_template('Project.html')
-
-@timer.route('/Invite.html')
-def invite():
-    return render_template('Invite.html')
-
-@timer.route('/page-goals')
-def page_goals():
-    return render_template('Goals.html')
-
 @timer.route('/add-task', methods=['POST'])
+@login_required
 def add_task():
     try:
         data = request.get_json()
@@ -121,7 +59,7 @@ def add_task():
                 duration += 24 * 60  # Add 24 hours in minutes
             
             print(f"Calculated duration: {duration} minutes")  # Debug print
-            new_data = Timer(task=task_description, date=datetime.strptime(date, "%Y-%m-%d").date(), start_time=start_time, end_time=end_time, duration=duration, status= 'pending')
+            new_data = Timer(user_id=current_user.id, task=task_description, date=datetime.strptime(date, "%Y-%m-%d").date(), start_time=start_time, end_time=end_time, duration=duration, status= 'pending')
             db.session.add(new_data)
             db.session.commit()
             
@@ -164,10 +102,11 @@ def add_task():
 
 # Endpoint untuk memulai timer untuk tugas tertentu
 @timer.route('/start-task/<int:task_id>', methods=['POST'])
+@login_required
 def start_task(task_id):
     global current_task_index
     try:
-        sum_timer = Timer.query.count()
+        sum_timer = Timer.query.filter_by(user_id=current_user.id).count()
         if task_id < 0 and task_id >= sum_timer:
             return jsonify({
                 'status': 'error',
@@ -195,13 +134,14 @@ def start_task(task_id):
         }), 500
         
 @timer.route('/data-by-date/<string:date>', methods=['GET'])
+@login_required
 def get_data_by_date(date):
     try:
         # Validasi format tanggal
         datetime.strptime(date, '%Y-%m-%d')
 
         # Ambil tugas berdasarkan tanggal
-        tasks = Timer.query.filter_by(date=datetime.strptime(date, "%Y-%m-%d").date()).all()
+        tasks = Timer.query.filter_by(user_id=current_user.id, date=datetime.strptime(date, "%Y-%m-%d").date()).all()
         result = [
             {
                 'id': task.id,
@@ -222,6 +162,7 @@ def get_data_by_date(date):
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @timer.route('/tasks', methods=['GET'])
+@login_required
 def get_tasks():
     print("Tasks defined")
     try:
@@ -229,11 +170,11 @@ def get_tasks():
         date = request.args.get('date')
         print(date)
         if date:
-            tasks = Timer.query.filter_by(date=datetime.strptime(date, "%Y-%m-%d").date()).all()
+            tasks = Timer.query.filter_by(user_id=current_user.id, date=datetime.strptime(date, "%Y-%m-%d").date()).all()
         else:
             # Gabungkan semua task jika tidak ada tanggal yang diberikan
             # tasks = [task for tasks in tasks_by_date.values() for task in tasks]
-            tasks = Timer.query.all()
+            tasks = Timer.query.filter_by(user_id=current_user.id).all()
 
         # Tambahkan atribut `startable`
         # result = [
@@ -261,6 +202,7 @@ def get_tasks():
         return jsonify({'status': 'error', 'message': str(e)}), 500
     
 @timer.route('/all-data', methods=['GET'])
+@login_required
 def get_all_data():
     try:
         all_data = {
@@ -327,6 +269,7 @@ def calculate_duration(start_time, end_time):
     return duration
 
 @timer.route('/notifications/<string:date>', methods=['GET'])
+@login_required
 def get_notifications(date):
     try:
         tasks = tasks_by_date.get(date, [])
@@ -367,10 +310,11 @@ def get_notifications(date):
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @timer.route('/reset-task', methods=['POST'])
+@login_required
 def reset_task():
     global tasks, current_task_index
     if current_task_index is not None:
-        task = Timer.query.filter_by(id=current_task_index).first()
+        task = Timer.query.filter_by(user_id=current_user.id, id=current_task_index).first()
         # tasks[current_task_index]['status'] = 'completed'
         current_task_index = None
     
