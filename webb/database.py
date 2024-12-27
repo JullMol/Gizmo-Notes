@@ -1,8 +1,20 @@
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy 
 from datetime import time
+from flask_login import UserMixin
 
 # Inisialisasi SQLAlchemy
 db = SQLAlchemy()
+
+# class User(db.Model, UserMixin):
+#     __tablename__ = 'users'
+#     id = db.Column(db.Integer, primary_key=True)
+#     username = db.Column(db.String(255), unique=True, nullable=False)
+#     email = db.Column(db.String(255), unique=True, nullable=False)
+#     password = db.Column(db.String(255), nullable=False)
+#     email_notif = db.Column(db.JSON, nullable=True, default={})
+    
+#     timers = db.relationship('Timer', backref='user', lazy=True,
+#                            foreign_keys='Timer.user_id')
 
 # Model Database
 class Timer(db.Model):
