@@ -102,7 +102,7 @@ def day_tasks():
     if request.method == 'GET':
         # Logika untuk mendapatkan data
         try:
-            tasks = ToDoListD.filter_by(user_id=current_user.id).query.all()
+            tasks = ToDoListD.query.filter_by(user_id=current_user.id).all()
             task_list = [{
                 'id': task.id,
                 'date': task.date.strftime('%Y-%m-%d'),
@@ -136,7 +136,7 @@ def day_tasks():
 def get_assignment_tasks():
     if request.method == 'GET':
         try:
-            tasks = ToDoListA.query.all()
+            tasks = ToDoListA.query.filter_by(user_id=current_user.id).all()
             task_list = [{
                 'id': task.id,
                 'date': task.date.strftime('%Y-%m-%d'),
@@ -170,7 +170,7 @@ def get_assignment_tasks():
 def get_event_tasks():
     if request.method == 'GET':
         try:
-            tasks = ToDoListE.query.all()
+            tasks = ToDoListE.query.filter_by(user_id=current_user.id).all()
             task_list = [{
                 'id': task.id,
                 'date': task.date.strftime('%Y-%m-%d'),

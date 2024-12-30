@@ -163,17 +163,84 @@ table, td { color: #000000; } #u_body a { color: #0000ee; text-decoration: under
 </table>
 
 <table id="u_content_text_1" style="font-family:'Raleway',sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
-  <tbody>
+  <thead>
     <tr>
-      <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:20px 40px 30px;font-family:'Raleway',sans-serif;" align="left">
-        
-  <div class="v-text-align" style="font-size: 14px; color: #ffffff; line-height: 140%; text-align: left; word-wrap: break-word;">
-    <p style="line-height: 140%;"><span data-metadata="&lt;!--(figmeta)eyJmaWxlS2V5IjoiTHJJMHBSU20xM203UWc0Tk1XZXVQeCIsInBhc3RlSUQiOjE4NjYyMDI5OTgsImRhdGFUeXBlIjoic2NlbmUifQo=(/figmeta)--&gt;" style="line-height: 19.6px;"></span><br /><br /><em><strong>This message aims to reminder to do list and will be sent every 24 hours.</strong></em></p>
-<p style="line-height: 140%;"> </p>
-  </div>
+      <h1 style="text-align: center; color: #ffffff">Daily Reminder for {{ user }}</h1>
 
-      </td>
+      <h2 style="text-align: left; color: #333333">To-Do List Day:</h2>
+      <table>
+          <thead>
+              <tr>
+                  <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2">Date</th>
+                  <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2">Time</th>
+                  <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2">Placement</th>
+                  <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2">Activities</th>
+                  <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2">Priority</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for todo in todoD %}
+              <tr>
+                  <td style="border: 1px solid #dddddd; text-align: left; padding: 8px">{{ todo.date }}</td>
+                  <td style="border: 1px solid #dddddd; text-align: left; padding: 8px">{{ todo.time }}</td>
+                  <td style="border: 1px solid #dddddd; text-align: left; padding: 8px">{{ todo.placement }}</td>
+                  <td style="border: 1px solid #dddddd; text-align: left; padding: 8px">{{ todo.activities }}</td>
+                  <td style="border: 1px solid #dddddd; text-align: left; padding: 8px">{{ todo.priority }}</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+  
+      <h2 style="text-align: left; color: #333333">To-Do List Assignment:</h2>
+      <table>
+          <thead>
+              <tr>
+                  <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2">Date</th>
+                  <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2">Time</th>
+                  <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2">Subject</th>
+                  <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2">Details</th>
+                  <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2">Priority</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for todo in todoA %}
+              <tr>
+                  <td style="border: 1px solid #dddddd; text-align: left; padding: 8px">{{ todo.date }}</td>
+                  <td style="border: 1px solid #dddddd; text-align: left; padding: 8px">{{ todo.time }}</td>
+                  <td style="border: 1px solid #dddddd; text-align: left; padding: 8px">{{ todo.subject }}</td>
+                  <td style="border: 1px solid #dddddd; text-align: left; padding: 8px">{{ todo.details }}</td>
+                  <td style="border: 1px solid #dddddd; text-align: left; padding: 8px">{{ todo.priority }}</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+  
+      <h2 style="text-align: left; color: #333333">To-Do List Event:</h2>
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+          <thead>
+              <tr>
+                  <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2"; >Date</th>
+                  <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2">Time</th>
+                  <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2">Location</th>
+                  <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2">Details</th>
+                  <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2">Priority</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for todo in todoE %}
+              <tr>
+                  <td style="border: 1px solid #dddddd; text-align: left; padding: 8px">{{ todo.date }}</td>
+                  <td style="border: 1px solid #dddddd; text-align: left; padding: 8px">{{ todo.time }}</td>
+                  <td style="border: 1px solid #dddddd; text-align: left; padding: 8px">{{ todo.location }}</td>
+                  <td style="border: 1px solid #dddddd; text-align: left; padding: 8px">{{ todo.details }}</td>
+                  <td style="border: 1px solid #dddddd; text-align: left; padding: 8px">{{ todo.priority }}</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
     </tr>
+  </thead>
+  <tbody>
   </tbody>
 </table>
 

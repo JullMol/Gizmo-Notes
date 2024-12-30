@@ -1,25 +1,45 @@
 import os
-from flask import session
-from flask_mail import Message
+from flask import Flask
+from flask_mail import Mail, Message
 from jinja2 import Template
-# from website.models import User
-from webb import templates
-from datetime import datetime, timezone
+from datetime import datetime
+from .database import Users
+from . import mail
 
 def daily_reminder():
-    # Membaca template HTML dari file reminder.html
-    template_path = os.path.join(os.getcwd(), 'webb/templates/reminder.html')  # Sesuaikan path jika perlu
-    with open(template_path, 'r', encoding='utf-8') as file:
-        template = Template(file.read())
+    template_path = 'webb/templates/reminder.html'
+    try:
+        with open(template_path, 'r', encoding='utf-8') as file:
+            template = Template(file.read())
+    except FileNotFoundError:
+        print("Template file not found!")
+        return
 
-    # Mendapatkan daftar pengguna yang mengaktifkan notifikasi harian
-    # users = User.query.filter(User.email_notif['daily_reminder']).all()
+    users = Users.query.all()
+    if not users:
+        print("No users found!")
+        return
 
-    # Mengirim email ke setiap pengguna
-    # for user in users:
-    #     msg = Message(
-    #         subject="Pengingat Harian",
-    #         recipients=[user.email],
-    #         html=template.render(user=user.username)  # Render template dengan data pengguna
-    #     )
-    #     templates.send(msg)
+    for user in users:
+        todoD = user.todo_listsD
+        todoA = user.todo_listsA
+        todoE = user.todo_listsE
+
+        rendered_html = template.render(
+            user=user.username,
+            todoD=todoD,
+            todoA=todoA,
+            todoE=todoE
+        )
+
+        msg = Message(
+            subject="To-Do List Reminder",
+            recipients=[user.email],
+            html=rendered_html
+        )
+
+        try:
+            mail.send(msg)
+            print(f"Email sent to {user.email}")
+        except Exception as e:
+            print(f"Failed to send email to {user.email}: {e}")
