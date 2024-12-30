@@ -69,6 +69,7 @@ function renderList(projectName, sessionTime, timeCreated, timeFinished) {
     deleteBtn.className = 'delete-btn1';
     deleteBtn.innerHTML = 'Delete';
     deleteBtn.onclick = function () {
+        fetch(`/delete_project?id=${row.rowIndex}`).then(response => response.json()).then(data => alert(data.message));
         table.deleteRow(row.rowIndex);
     };
     actionCell.appendChild(deleteBtn);

@@ -38,11 +38,10 @@ def Saveproject():
 @project.route('/getproject', methods=['GET'])
 @login_required
 def getproject():
-<<<<<<< HEAD
     tasks_ = pproject.query.all()  # Ambil semua data project
-=======
+
     tasks_ = pproject.query.filter_by(user_id=current_user.id).all()  # Fetch all projects
->>>>>>> 64e6e916d1ebdfb2f558ba1651dcba27f4e7ddd8
+
     res = []
 
     # Format setiap project ke dalam JSON
@@ -57,6 +56,23 @@ def getproject():
         })
 
     return jsonify({'status': 'success', 'tasks': res}), 200
+
+@project.route('/delete_project', methods=['GET'])
+@login_required
+def deleteproject():
+    tasks = request.args.get('id')
+    if not tasks:
+        return jsonify({'message': 'Project is not found'})
+    try:
+        task = pproject.query.get(tasks)
+        if task:
+            db.session.delete(task)
+            db.session.commit()
+            return jsonify ({'message': 'Project deleted successfully'})
+        else:
+            return jsonify({'message': 'Project is not found'})
+    except Exception as e:
+        return jsonify({'message': 'Error deleting project', 'error': str(e)}), 400
 
 if __name__ == '__main__':
     project.run(debug=True)
