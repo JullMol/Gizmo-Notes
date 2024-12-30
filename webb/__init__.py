@@ -13,6 +13,7 @@ mail =  Mail()
 app = Flask(__name__)
 DB_name = 'local_database.db'
 migrate = Migrate()
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 def create_app():
     # Konfigurasi database
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_name}'  # Menggunakan SQLite
@@ -65,3 +66,16 @@ def create_app():
 #     if not os.path.exists('webb/{DB_name}'):
 #         with app.app_context():
 #             db.create_all()  # Membuat semua tabel, termasuk tabel 'members'
+
+# @app.route('/api/bot_invite', methods=['GET'])
+# def bot_invite():
+#     invite_link = os.getenv('personal_bot_link')
+#     return {"invite_link": invite_link}, 200
+
+@app.route('/run_bot', methods=['GET'])
+def run_bot():
+    from .tes import run_bot
+    try:
+        run_bot()
+    except Exception as e:
+        return str(e), 500

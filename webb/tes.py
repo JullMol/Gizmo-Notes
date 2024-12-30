@@ -1,8 +1,8 @@
-from flask import Flask
-from threading import Thread
 import discord
 from discord.ext import commands, tasks
 from discord.utils import get
+# from flask import Flask
+# # from threading import Thread
 import asyncio
 import requests
 import wave
@@ -12,11 +12,12 @@ import os
 from fpdf import FPDF
 import csv
 from datetime import datetime
-from database import Member, Record, Users, db
+from .database import Member, Record, Users, db
 from flask_sqlalchemy import SQLAlchemy
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from . import app
 
 # Load environment variables
 load_dotenv()
@@ -32,24 +33,25 @@ if not BOT_TOKEN:
     raise ValueError("Bot token is missing! Please check your .env file.")
 
 # Flask App
-app = Flask(__name__)
+# app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local_database.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db.init_app(app)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local_database.db'
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# db.init_app(app)
 
-@app.route("/")
-def home():
-    return "Hello from Flask!"
+# @app.route("/")
+# def home():
+    # return "Hello from Flask!"
 
-def run_flask():
-    app.run(host="0.0.0.0", port=5000)
+# def run_flask():
+    # app.run(host="0.0.0.0", port=5000)
 
 # Discord Bot
 intents = discord.Intents.default()
 intents.messages = True
 intents.message_content = True
 intents.voice_states = True
+global bot
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # Flask thread check
@@ -64,11 +66,6 @@ MAX_RECORD_DURATION = 5 * 60
 is_recording = False
 voice_client = None
 recording_data = []
-
-@app.route('/api/bot_invite', methods=['GET'])
-def bot_invite():
-    invite_link = personal_bot
-    return {"invite_link": invite_link}, 200
 
 @bot.event
 async def on_member_update(before, after):
@@ -115,14 +112,14 @@ async def on_member_join(member):
     except discord.HTTPException as e:
         print(f"Something error: {e}")
 
-@bot.event
-async def on_ready():
-    global flask_thread_started
-    print(f"Bot {bot.user} is ready!")
-    if not flask_thread_started:
-        flask_thread_started = True
-        thread = Thread(target=run_flask)
-        thread.start()
+# @bot.event
+# async def on_ready():
+#     global flask_thread_started
+#     print(f"Bot {bot.user} is ready!")
+#     if not flask_thread_started:
+#         flask_thread_started = True
+#         thread = Thread(target=run_flask)
+#         thread.start()
 
 @bot.command()
 async def hello(ctx):
@@ -868,5 +865,5 @@ async def email_invite(ctx, channel_name: str, user_id: int = None):
     except Exception as e:
         await ctx.send(f"An error occurred: {str(e)}")
 
-# Run the bot
-bot.run(BOT_TOKEN)
+def run_bot():
+    bot.run(BOT_TOKEN)
