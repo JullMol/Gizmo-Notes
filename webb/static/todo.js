@@ -6,33 +6,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const eventView = document.getElementById('eventView');
     const EventLink = document.getElementById('EventLink');
 
-    function showView(viewToShow) {
-        dayView.style.display = 'none';
-        assignmentView.style.display = 'none';
-        eventView.style.display = 'none';
-        viewToShow.style.display = 'block';
-    }
-
-    DayLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        showView(dayView)
-    });
-
-    AssignmentLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        showView(assignmentView)
-    });
-
-    EventLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        showView(eventView)
-    });
 
     // Fungsi untuk memuat tugas dari localStorage
     function loadTasksFromLocalStorage(storageKey, tableSelector) {
         const tasks = JSON.parse(localStorage.getItem(storageKey) || '[]');
         const tableBody = document.querySelector(tableSelector);
-        console.log(tableBody);
         if (tableBody) {
             tableBody.innerHTML = ''; // Bersihkan tabel sebelum memuat
 
