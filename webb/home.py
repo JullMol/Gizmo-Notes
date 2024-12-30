@@ -58,6 +58,11 @@ def Group():
 def Calendar():
     return render_template('Calendar.html')
 
+@home.route('/Project.html')
+@login_required
+def Project():
+    return render_template('Project.html')
+
 @home.route('/Invite.html')
 @login_required
 def invite():
