@@ -22,8 +22,6 @@ import requests
 # Load environment variables
 load_dotenv()
 
-
-
 FLASK_SERVER_URL = os.getenv("FLASK_SERVER_URL")
 FLASK_API_URL = os.getenv("FLASK_API_URL")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -107,7 +105,7 @@ async def on_member_update(before, after):
 @bot.command()
 async def clear(ctx):
     await ctx.channel.purge()
-    await ctx.send("Channel has been cleared!")
+    await ctx.send("🧹 Channel has been cleared!")
 
 @bot.event
 async def on_member_join(member):
@@ -132,7 +130,7 @@ async def on_member_join(member):
 @bot.event
 async def on_ready():
     global flask_thread_started
-    print(f"Bot {bot.user} is ready!")
+    print(f"🤖 Bot {bot.user} is ready!")
     if not flask_thread_started:
         flask_thread_started = True
         thread = Thread(target=run_flask)
@@ -141,30 +139,30 @@ async def on_ready():
 @bot.command()
 async def hello(ctx):
     if isinstance(ctx.channel, discord.DMChannel):  # Command issued in DM
-        await ctx.send(f"Hello, {ctx.author.display_name}!")
+        await ctx.send(f"👋 Hello {ctx.author.display_name}!\n🤖I'm Bot Gizmo GP, you can get information about the instruction if you send me\n\n```!ping```\n")
     else:  # Command issued in public channel
-        await ctx.send(f"Hello, {ctx.author.display_name}!")
+        await ctx.send(f"👋 Hello {ctx.author.display_name}!,\n🤖I'm Bot Gizmo GP, you can get information about the instruction if you send me\n\n```!ping```\n")
     
 @bot.command()
 async def ping(ctx):
     await ctx.send(
-        "Hello! I am your personal bot. Here are the commands you can use:\n"
-        "1. !get_email <user_id>: Get email about member\n"
-        "2. !get_id <email_user_login> : Get information about user_id for !get_email and !email_invite\n"
-        "3. !create_gp <category_name> : Create default category and channel\n"
-        "4. !add_gp <category_name> <channel_name> : Add channel to category\n"
-        "5. !add_meet <category _name> <voice_channel_name> : Create voice channel\n"
-        "6. !email_invite <channel_name> <user_id> : Send email invitation to all members\n"
-        "7. !role : View role\n"
-        "8. !pick_role <role_name> : Select role\n"
-        "9. !change_role <@Username> <role_name> : Change role other member if you are Admin\n"
-        "10. !start_text <category_name> <channel_name> : Record activity in text channel\n"
-        "11. !stop_text <category_name> <channel_name> : Stop recording text channel\n"
-        "12. !convert_and_upload <channel_name> : Convert csv files record to pdf and upload to AnonFiles\n"
-        "13. !start_voice <category_name> <voice_channel_name> : Record activity in voice channel\n"
-        "14. !stop_voice <category_name> <voice_channel_name> : Stop recording voice channel\n"
-        "15. !end_gp : <category_name> : Delete \n"
-        "16. !clear : Clear history"
+        "🔔 Hello! I am your personal bot Gizmo GP. Here are the commands you can use: 🚀\n"
+        "1️⃣ !get_id <email_user_login> : 🔍 Get information about user_id for !get_email and !email_invite\n"
+        "2️⃣ !get_email <user_id>: 📧 Get email about a member\n"
+        "3️⃣ !create_gp <category_name> : 🏗️ Create default category and channel\n"
+        "4️⃣ !add_gp <category_name> <channel_name> : ➕ Add channel to category\n"
+        "5️⃣ !add_meet <category_name> <voice_channel_name> : 🎙️ Create voice channel\n"
+        "6️⃣ !email_invite <channel_name> <user_id> : ✉️ Send email invitation to all members\n"
+        "7️⃣ !role : 🧑‍💼 View available roles\n"
+        "8️⃣ !pick_role <role_name> : 🎭 Select a role\n"
+        "9️⃣ !change_role <@Username> <role_name> : 🔄 Change another member's role (Admin only)\n"
+        "🔟 !start_text <category_name> <channel_name> : 📝 Record activity in a text channel\n"
+        "1️⃣1️⃣ !stop_text <category_name> <channel_name> : 🛑 Stop recording in a text channel\n"
+        "1️⃣2️⃣ !convert_and_upload <channel_name> : 🔄 Convert CSV files to PDF and upload to AnonFiles\n"
+        "1️⃣3️⃣ !start_voice <category_name> <voice_channel_name> : 🎙️ Record activity in a voice channel\n"
+        "1️⃣4️⃣ !stop_voice <category_name> <voice_channel_name> : 🛑 Stop recording in a voice channel\n"
+        "1️⃣5️⃣ !end_gp <category_name> : 🗑️ Delete a category\n"
+        "1️⃣6️⃣ !clear : 🧹 Clear channel history"
     )
     
 @bot.command()
@@ -202,13 +200,13 @@ async def create_gp(ctx, category_name: str, *, default_channel_name: str = None
     # Periksa apakah kategori sudah ada
     existing_category = discord.utils.get(guild.categories, name=formatted_category_name)
     if existing_category:
-        await ctx.send(f"Category with named **{formatted_category_name}** is already!")
+        await ctx.send(f"🏗️ Category with named **{formatted_category_name}** is already!")
         return
 
     # Membuat kategori baru
     try:
         new_category = await guild.create_category(formatted_category_name)
-        await ctx.send(f"Category with named**{new_category.name}** successfully created!")
+        await ctx.send(f"🏗️ Category with named**{new_category.name}** successfully created!")
 
         # Mengatur izin khusus untuk channel default
         overwrites = {
@@ -221,11 +219,11 @@ async def create_gp(ctx, category_name: str, *, default_channel_name: str = None
             formatted_channel_name, category=new_category, overwrites=overwrites
         )
         await ctx.send(
-            f"Default Channel with named **{new_channel.name}** created successfully in Category named **{new_category.name}**!\n"
+            f"🌐 Default Channel with named **{new_channel.name}** created successfully in Category named **{new_category.name}**!\n"
             f"Link: https://discord.com/channels/{guild.id}/{new_channel.id}"
         )
     except discord.Forbidden:
-        await ctx.send("I don't have permission to create categories or channels!")
+        await ctx.send("❌ I don't have permission to create categories or channels!")
     except discord.HTTPException as e:
         await ctx.send(f"Something error: {e}")
             
@@ -241,7 +239,7 @@ async def add_gp(ctx, category_name: str, *, channel_name: str):
     # Temukan kategori berdasarkan nama
     category = discord.utils.get(guild.categories, name=formatted_category_name)
     if not category:
-        await ctx.send(f"Category with named **{formatted_category_name}** not found!")
+        await ctx.send(f"❌ Category with named **{formatted_category_name}** not found!")
         return
 
     # Tentukan nama channel default (ini bisa disesuaikan dengan nama yang diberikan oleh pengguna)
@@ -252,21 +250,21 @@ async def add_gp(ctx, category_name: str, *, channel_name: str):
 
     # Pastikan perintah dijalankan di channel default
     if ctx.channel != default_channel:
-        await ctx.send(f"This command can only be run on the default channel **{default_channel_name}**!")
+        await ctx.send(f"❌ This command can only be run on the default channel **{default_channel_name}**!")
         return
 
     # Cek apakah channel sudah ada dalam kategori
     existing_channel = discord.utils.get(category.channels, name=formatted_channel_name)
     if existing_channel:
-        await ctx.send(f"Channel with named **{formatted_channel_name}** is already in Category Named **{category.name}**!")
+        await ctx.send(f"➕ Channel with named **{formatted_channel_name}** is already in Category Named **{category.name}**!")
         return
 
     # Membuat channel baru di dalam kategori
     try:
         new_channel = await guild.create_text_channel(formatted_channel_name, category=category)
-        await ctx.send(f"Channel with named **{new_channel.name}** created successfully in Category named **{category.name}**!")
+        await ctx.send(f"➕ Channel with named **{new_channel.name}** created successfully in Category named **{category.name}**!")
     except discord.Forbidden:
-        await ctx.send("I don't have permission to create channels!")
+        await ctx.send("❌ I don't have permission to create channels!")
     except discord.HTTPException as e:
         await ctx.send(f"Something error: {e}")
             
@@ -277,7 +275,7 @@ async def link(ctx, *, category_name: str):
     # Temukan kategori berdasarkan nama
     category = discord.utils.get(guild.categories, name=category_name)
     if not category:
-        await ctx.send(f"Category with named **{category_name}** not found!")
+        await ctx.send(f"❌ Category with named **{category_name}** not found!")
         return
 
     # Dapatkan semua channel dalam kategori
@@ -287,10 +285,10 @@ async def link(ctx, *, category_name: str):
             for channel in category.channels
         ]
         await ctx.send(
-            f"Channel in Category **{category.name}**:\n" + "\n".join(channel_links)
+            f"🌐 Channel in Category **{category.name}**:\n" + "\n".join(channel_links)
         )
     else:
-        await ctx.send(f"Category with named **{category.name}** not have channel!")
+        await ctx.send(f"🌐 Category with named **{category.name}** not have channel!")
         
 @bot.command()
 async def role(ctx):
@@ -302,11 +300,11 @@ async def role(ctx):
     # Periksa apakah role-role tersebut ada di server
     available_roles = [role.name for role in guild.roles if role.name in role_names]
     if not available_roles:
-        await ctx.send("There are no roles available on this server!")
+        await ctx.send("❌ There are no roles available on this server!")
         return
 
     # Kirim daftar role ke user
-    await ctx.send(f"Available Roles: {', '.join(available_roles)}")
+    await ctx.send(f"🧑‍💼 Available Roles: {', '.join(available_roles)}")
 
 
 @bot.command()
@@ -317,12 +315,12 @@ async def pick_role(ctx, *, role_name: str):
     # Periksa apakah role ada di server
     role = discord.utils.get(guild.roles, name=role_name)
     if not role:
-        await ctx.send(f"Role **{role_name}** not found! Use `!role` to view the list of available roles.")
+        await ctx.send(f"❌ Role **{role_name}** not found! Use `!role` to view the list of available roles.")
         return
 
     # Periksa apakah user sudah memiliki role tersebut
     if role in member.roles:
-        await ctx.send(f"You already have a role **{role_name}**!")
+        await ctx.send(f"🎭 You already have a role **{role_name}**!")
         return
 
     # Hapus role lain sebelum menambahkan role baru
@@ -336,9 +334,9 @@ async def pick_role(ctx, *, role_name: str):
 
         # Tambahkan role baru
         await member.add_roles(role)
-        await ctx.send(f"Your role has been updated to **{role_name}**!")
+        await ctx.send(f"🎭 Your role has been updated to **{role_name}**!")
     except discord.Forbidden:
-        await ctx.send("I don't have permission to change your role!")
+        await ctx.send("❌ I don't have permission to change your role!")
     except discord.HTTPException as e:
         await ctx.send(f"Something error: {e}")
 
@@ -353,12 +351,12 @@ async def change_role(ctx, member: discord.Member, *, role_name: str):
     # Validasi role
     role = discord.utils.get(guild.roles, name=role_name)
     if not role or role_name not in allowed_roles:
-        await ctx.send(f"Role **{role_name}** invalid! Available roles: {', '.join(allowed_roles)}")
+        await ctx.send(f"❌ Role **{role_name}** invalid! Available roles: {', '.join(allowed_roles)}")
         return
 
     # Periksa apakah member sudah memiliki role tersebut
     if role in member.roles:
-        await ctx.send(f"Member **{member.display_name}** already have a role **{role_name}**!")
+        await ctx.send(f"🎭 Member **{member.display_name}** already have a role **{role_name}**!")
         return
 
     # Hapus role lama (jika ada) sebelum menambahkan role baru
@@ -371,9 +369,9 @@ async def change_role(ctx, member: discord.Member, *, role_name: str):
 
         # Tambahkan role baru
         await member.add_roles(role)
-        await ctx.send(f"Member role **{member.display_name}** has been changed to **{role_name}** by **{ctx.author.display_name}**.")
+        await ctx.send(f"🎭 Member role **{member.display_name}** has been changed to **{role_name}** by **{ctx.author.display_name}**.")
     except discord.Forbidden:
-        await ctx.send("I do not have permission to change this member role!")
+        await ctx.send("❌ I do not have permission to change this member role!")
     except discord.HTTPException as e:
         await ctx.send(f"Something error: {e}")
         
@@ -389,7 +387,7 @@ async def add_meet(ctx, category_name: str, *, voice_channel_name: str):
     # Temukan kategori berdasarkan nama
     category = discord.utils.get(guild.categories, name=formatted_category_name)
     if not category:
-        await ctx.send(f"Category with named **{formatted_category_name}** not found!")
+        await ctx.send(f"❌ Category with named **{formatted_category_name}** not found!")
         return
 
     # Tentukan nama channel default
@@ -400,21 +398,21 @@ async def add_meet(ctx, category_name: str, *, voice_channel_name: str):
 
     # Pastikan perintah dijalankan di channel default
     if ctx.channel != default_channel:
-        await ctx.send(f"This command can only be run on the default channel **{default_channel_name}**!")
+        await ctx.send(f"❌ This command can only be run on the default channel **{default_channel_name}**!")
         return
 
     # Cek apakah voice channel sudah ada dalam kategori
     existing_channel = discord.utils.get(category.voice_channels, name=formatted_voice_channel_name)
     if existing_channel:
-        await ctx.send(f"Voice channel **{formatted_voice_channel_name}** is already in Category **{category.name}**!")
+        await ctx.send(f"➕ Voice channel **{formatted_voice_channel_name}** is already in Category **{category.name}**!")
         return
 
     # Membuat voice channel baru di dalam kategori
     try:
         new_voice_channel = await guild.create_voice_channel(formatted_voice_channel_name, category=category)
-        await ctx.send(f"Voice channel **{new_voice_channel.name}** created successfully in Category named **{category.name}**!")
+        await ctx.send(f"➕ Voice channel **{new_voice_channel.name}** created successfully in Category named **{category.name}**!")
     except discord.Forbidden:
-        await ctx.send("I don't have permission to create voice channels!")
+        await ctx.send("❌ I don't have permission to create voice channels!")
     except discord.HTTPException as e:
         await ctx.send(f"Something error: {e}")
 
@@ -429,7 +427,7 @@ async def start_text(ctx, category_name: str, *, channel_name: str):
     # Temukan kategori berdasarkan nama
     category = discord.utils.get(guild.categories, name=formatted_category_name)
     if not category:
-        await ctx.send(f"Category with named **{formatted_category_name}** not found!")
+        await ctx.send(f"❌ Category with named **{formatted_category_name}** not found!")
         return
 
     # Tentukan nama channel default
@@ -440,14 +438,14 @@ async def start_text(ctx, category_name: str, *, channel_name: str):
 
     # Validasi: Perintah hanya dijalankan di channel default
     if ctx.channel != default_channel:
-        await ctx.send(f"This command can only be run on the default channel **{default_channel_name}**!")
+        await ctx.send(f"❌ This command can only be run on the default channel **{default_channel_name}**!")
         return
 
     # Simpan status perekaman
     global recording_status, recording_channel
     recording_status = True
     recording_channel = formatted_channel_name
-    await ctx.send(f"Recording started for channel **{formatted_channel_name}** in category **{formatted_category_name}**.")
+    await ctx.send(f"✅ Recording started for channel **{formatted_channel_name}** in category **{formatted_category_name}**.")
 
 @bot.command()
 async def stop_text(ctx, category_name: str, *, channel_name: str):
@@ -460,7 +458,7 @@ async def stop_text(ctx, category_name: str, *, channel_name: str):
     # Temukan kategori berdasarkan nama
     category = discord.utils.get(guild.categories, name=formatted_category_name)
     if not category:
-        await ctx.send(f"Category with named **{formatted_category_name}** not found!")
+        await ctx.send(f"❌ Category with named **{formatted_category_name}** not found!")
         return
 
     # Tentukan nama channel default
@@ -471,7 +469,7 @@ async def stop_text(ctx, category_name: str, *, channel_name: str):
 
     # Validasi: Perintah hanya dijalankan di channel default
     if ctx.channel != default_channel:
-        await ctx.send(f"This command can only be run on the default channel **{default_channel_name}**!")
+        await ctx.send(f"❌ This command can only be run on the default channel **{default_channel_name}**!")
         return
 
     # Hentikan perekaman
@@ -479,9 +477,9 @@ async def stop_text(ctx, category_name: str, *, channel_name: str):
     if recording_status and recording_channel == formatted_channel_name:
         recording_status = False
         recording_channel = None
-        await ctx.send(f"Recording stopped for channel **{formatted_channel_name}** in category **{formatted_category_name}**.")
+        await ctx.send(f"✅ Recording stopped for channel **{formatted_channel_name}** in category **{formatted_category_name}**.")
     else:
-        await ctx.send("No recording is currently active.")
+        await ctx.send("❌ No recording is currently active.")
 
 @bot.event
 async def on_message(message):
@@ -511,7 +509,7 @@ async def convert_and_upload(ctx, category_name: str, *, channel_name: str):
     # Temukan kategori berdasarkan nama
     category = discord.utils.get(guild.categories, name=formatted_category_name)
     if not category:
-        await ctx.send(f"Category with named **{formatted_category_name}** not found!")
+        await ctx.send(f"❌ Category with named **{formatted_category_name}** not found!")
         return
 
     # Tentukan nama channel default
@@ -522,7 +520,7 @@ async def convert_and_upload(ctx, category_name: str, *, channel_name: str):
 
     # Validasi: Perintah hanya dijalankan di channel default
     if ctx.channel != default_channel:
-        await ctx.send(f"This command can only be run on the default channel **{default_channel_name}**!")
+        await ctx.send(f"❌ This command can only be run on the default channel **{default_channel_name}**!")
         return
 
     # Konversi CSV ke PDF
@@ -532,7 +530,7 @@ async def convert_and_upload(ctx, category_name: str, *, channel_name: str):
     try:
         csv_to_pdf(csv_filename, pdf_filename)
     except FileNotFoundError:
-        await ctx.send(f"CSV file `{csv_filename}` not found. Ensure recording was started for this channel.")
+        await ctx.send(f"❌ CSV file `{csv_filename}` not found. Ensure recording was started for this channel.")
         return
 
     # Upload file PDF to AnonFiles
@@ -598,7 +596,7 @@ async def start_voice(ctx, category_name: str, *, voice_channel_name: str):
     global is_recording, recording_data, voice_client
 
     if is_recording:
-        await ctx.send("Rekaman sedang berlangsung. Gunakan `!stop_record_voice` untuk menghentikan.")
+        await ctx.send("❌ Recording is in progress. Use `!stop_record_voice` to stop.")
         return
 
     guild = ctx.guild
@@ -611,7 +609,7 @@ async def start_voice(ctx, category_name: str, *, voice_channel_name: str):
     # Temukan kategori berdasarkan nama
     category = discord.utils.get(guild.categories, name=formatted_category_name)
     if not category:
-        await ctx.send(f"Category with named **{formatted_category_name}** not found!")
+        await ctx.send(f"❌ Category with named **{formatted_category_name}** not found!")
         return
 
     # Tentukan nama channel default
@@ -622,23 +620,23 @@ async def start_voice(ctx, category_name: str, *, voice_channel_name: str):
 
     # Validasi: Perintah hanya dijalankan di channel default
     if ctx.channel != default_channel:
-        await ctx.send(f"This command can only be run on the default channel **{default_channel_name}**!")
+        await ctx.send(f"❌ This command can only be run on the default channel **{default_channel_name}**!")
         return
     
     # Cek apakah channel sudah ada dalam kategori
     existing_channel = discord.utils.get(category.channels, name=formatted_voice_channel_name)
     if existing_channel:
-        await ctx.send(f"Channel with named **{formatted_voice_channel_name}** is already in Category Named **{category.name}**!")
+        await ctx.send(f"✅ Channel with named **{formatted_voice_channel_name}** is already in Category Named **{category.name}**!")
         return
 
     if not channel:
-        await ctx.send(f"Voice channel **{voice_channel_name}** tidak ditemukan!")
+        await ctx.send(f"❌ Voice channel **{voice_channel_name}** is not found!")
         return
 
     try:
         # Hubungkan bot ke voice channel
         voice_client = await channel.connect()
-        await ctx.send(f"Bot terhubung ke voice channel **{voice_channel_name}**. Mulai merekam selama maksimal 5 menit...")
+        await ctx.send(f"🤖 Bot connected to voice channel **{voice_channel_name}**. Start recording for a maximum of 5 minutes...")
 
         # Reset buffer dan set status rekaman
         recording_data = []
@@ -657,7 +655,7 @@ async def start_voice(ctx, category_name: str, *, voice_channel_name: str):
             await stop_recording(ctx)
 
     except Exception as e:
-        await ctx.send(f"Terjadi kesalahan: {e}")
+        await ctx.send(f"Something error: {e}")
         if voice_client and voice_client.is_connected():
             await voice_client.disconnect()
 
@@ -673,7 +671,7 @@ async def stop_voice(ctx, category_name: str, *, voice_channel_name: str):
     # Temukan kategori berdasarkan nama
     category = discord.utils.get(guild.categories, name=formatted_category_name)
     if not category:
-        await ctx.send(f"Category with named **{formatted_category_name}** not found!")
+        await ctx.send(f"❌ Category with named **{formatted_category_name}** not found!")
         return
 
     # Tentukan nama channel default
@@ -684,18 +682,18 @@ async def stop_voice(ctx, category_name: str, *, voice_channel_name: str):
 
     # Validasi: Perintah hanya dijalankan di channel default
     if ctx.channel != default_channel:
-        await ctx.send(f"This command can only be run on the default channel **{default_channel_name}**!")
+        await ctx.send(f"❌ This command can only be run on the default channel **{default_channel_name}**!")
         return
     
     # Cek apakah channel sudah ada dalam kategori
     existing_channel = discord.utils.get(category.channels, name=formatted_voice_channel_name)
     if existing_channel:
-        await ctx.send(f"Channel with named **{formatted_voice_channel_name}** is already in Category Named **{category.name}**!")
+        await ctx.send(f"✅ Channel with named **{formatted_voice_channel_name}** is already in Category Named **{category.name}**!")
         return
     
     global is_recording
     if not is_recording:
-        await ctx.send("Tidak ada rekaman yang sedang berlangsung.")
+        await ctx.send("❌ No recording in progress!.")
         return
 
     # Hentikan rekaman
@@ -711,7 +709,7 @@ async def stop_recording(ctx, category_name: str, *, voice_channel_name: str):
     # Temukan kategori berdasarkan nama
     category = discord.utils.get(guild.categories, name=formatted_category_name)
     if not category:
-        await ctx.send(f"Category with named **{formatted_category_name}** not found!")
+        await ctx.send(f"❌ Category with named **{formatted_category_name}** not found!")
         return
 
     # Tentukan nama channel default
@@ -722,13 +720,13 @@ async def stop_recording(ctx, category_name: str, *, voice_channel_name: str):
 
     # Validasi: Perintah hanya dijalankan di channel default
     if ctx.channel != default_channel:
-        await ctx.send(f"This command can only be run on the default channel **{default_channel_name}**!")
+        await ctx.send(f"❌ This command can only be run on the default channel **{default_channel_name}**!")
         return
     
     # Cek apakah channel sudah ada dalam kategori
     existing_channel = discord.utils.get(category.channels, name=formatted_voice_channel_name)
     if existing_channel:
-        await ctx.send(f"Channel with named **{formatted_voice_channel_name}** is already in Category Named **{category.name}**!")
+        await ctx.send(f"✅ Channel with named **{formatted_voice_channel_name}** is already in Category Named **{category.name}**!")
         return
     
     global is_recording, recording_data, voice_client
@@ -752,11 +750,10 @@ async def stop_recording(ctx, category_name: str, *, voice_channel_name: str):
     # Unggah ke GoFile
     file_url = upload_to_gofiles(mp3_filename)
 
-    await ctx.send(f"Rekaman selesai. File diunggah ke GoFile: {file_url}")
+    await ctx.send(f"✅ Recording completed. File uploaded to GoFile: {file_url}")
 
 # Fungsi: Simpan data audio ke file WAV
 def save_audio(data, filename):
-    """Menyimpan data audio ke file WAV."""
     with wave.open(filename, "wb") as wav_file:
         wav_file.setnchannels(1)  # Mono
         wav_file.setsampwidth(2)  # 16-bit audio
@@ -765,13 +762,11 @@ def save_audio(data, filename):
 
 # Fungsi: Konversi WAV ke MP3
 def convert_to_mp3(wav_filename, mp3_filename):
-    """Mengonversi file WAV ke MP3 menggunakan FFmpeg."""
     command = ["ffmpeg", "-y", "-i", wav_filename, "-vn", "-ar", "44100", "-ac", "2", "-b:a", "192k", mp3_filename]
     subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 # Fungsi: Upload file ke GoFiles
 def upload_to_gofiles(filename):
-    """Mengunggah file ke GoFile dan mengembalikan tautan unduhan."""
     try:
         with open(filename, "rb") as f:
             response = requests.post("https://store1.gofile.io/uploadFile", files={"file": f}, verify=True)
@@ -793,18 +788,52 @@ async def end_gp(ctx, *, category_name: str):
     guild = ctx.guild
     category = discord.utils.get(guild.categories, name=category_name)
     if not category:
-        await ctx.send(f"Category with named **{category_name}** not found!")
+        await ctx.send(f"❌ Category with named **{category_name}** not found!")
         return
 
     try:
         for channel in category.channels:
             await channel.delete()
         await category.delete()
-        await ctx.send(f"Category **{category_name}** successfully deleted along with all channels in it!")
+        await ctx.send(f"✅ Category **{category_name}** successfully deleted along with all channels in it!")
     except discord.Forbidden:
-        await ctx.send("I don't have permission to delete categories or channels!")
+        await ctx.send("❌ I don't have permission to delete categories or channels!")
     except discord.HTTPException as e:
         await ctx.send(f"Something error: {e}")
+        
+@bot.command()
+async def get_email(ctx, user_id: int = None):
+    try:
+        download_database()
+        with app.app_context():
+            if user_id is not None:
+                # Query satu anggota berdasarkan user_id
+                member = Member.query.filter_by(user_id=user_id).first()
+                
+                emails = [f"Name: {member.name}, Email: {member.email}"]
+                email_message = "\n".join(emails)
+                
+                if member and member.email:
+                    await ctx.send(
+                        f"📧 Email Member:\n```\n{email_message}\n```"
+                    )
+                else:
+                    await ctx.send(f"❌ No members found with user_id `{user_id}` or email has not been set up.")
+            else:
+                # Query semua anggota dengan email yang valid
+                members = Member.query.filter(Member.email.isnot(None)).all()
+                
+                emails = [f"Name: {member.name}, Email: {member.email}" for member in members]
+                email_message = "\n".join(emails)
+                
+                if not members:
+                    await ctx.send("❌ No email data found in the database!")
+                    return
+                # Kirim daftar email sebagai pesan
+                await ctx.send(f"📧 Here are all the emails found:\n```\n{email_message}\n```")
+    except Exception as e:
+        await ctx.send(f"❌ An error occurred while retrieving email data: {str(e)}")
+
         
 @bot.command()
 @commands.has_role("Admin")  # Hanya admin yang bisa menggunakan perintah ini
