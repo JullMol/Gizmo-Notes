@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let isBreak = false;
 
     createGoals.addEventListener('click', function () {
-        window.location.href = '/page-goals';
+        window.location.href = '/Goals.html';
     });
 
     function fetchTasks() {

@@ -8,19 +8,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const addRowBtn = document.querySelector('.add-row-btn'); // Tombol Add
     const addSchBtn = document.querySelector('.add-sch-btn');
     
-    function showView(viewToShow) {
-        groupProjectView.style.display = 'none';
-        viewToShow.style.display = 'block';
-    }
+    // function showView(viewToShow) {
+    //     groupProjectView.style.display = 'none';
+    //     viewToShow.style.display = 'block';
+    // }
 
-    groupProjectLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        showView(groupProjectView);
-    });
+    // groupProjectLink.addEventListener('click', function(e) {
+    //     e.preventDefault();
+    //     showView(groupProjectView);
+    // });
 
     // Fungsi untuk menambahkan baris kosong dengan inputan kosong (termasuk Role)
     addRowBtn.addEventListener('click', function() {
-        window.location.href = '/invite'; // Ganti path sesuai kebutuhan
+        window.location.href = '/Invite.html'; // Ganti path sesuai kebutuhan
     });    
 
     addSchBtn.addEventListener('click', function() {
