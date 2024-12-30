@@ -66,10 +66,18 @@ def invite():
 @project.route('/saveproject', methods=['POST'])
 def Saveproject():
     data = request.get_json()
+    
+    # Parsing waktu dari request
     tm = data.get('timeCreated')
-    tm_ = datetime.strptime(tm, '%Y-%m-%dT%H:%M')
     tm1 = data.get('timeFinished')
-    tm1_ = datetime.strptime(tm, '%Y-%m-%dT%H:%M')
+    
+    try:
+        tm_ = datetime.strptime(tm, '%Y-%m-%dT%H:%M')  # Format input dari frontend
+        tm1_ = datetime.strptime(tm1, '%Y-%m-%dT%H:%M')
+    except ValueError as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 400
+
+    # Menyimpan data ke database
     project_table = pproject(
         project_name=data.get('projekname'),
         session2=data.get('session2'),
@@ -79,27 +87,22 @@ def Saveproject():
     db.session.add(project_table)
     db.session.commit()
 
-    # print(f"Task added for {date}: {task}")
-    return jsonify({'status': 'success', 'message': 'Task added successfully'}), 200
+    return jsonify({'status': 'success', 'message': 'Project added successfully'}), 200
 
 @project.route('/getproject', methods=['GET'])
 def getproject():
-    tasks_ = pproject.query.all()  # Fetch all projects
+    tasks_ = pproject.query.all()  # Ambil semua data project
     res = []
 
-    # Loop through each task and manually format the time fields
+    # Format setiap project ke dalam JSON
     for task in tasks_:
-        # Convert datetime objects to string in the desired format
-        start = task.time_created.strftime('%Y-%m-%dT%H:%M:%S')  # Format the datetime
-        end = task.time_finished.strftime('%Y-%m-%dT%H:%M:%S')  # Format the datetime
-        
-        # Append the task data along with formatted times
+        # Gunakan `.isoformat()` untuk mendapatkan format ISO8601
         res.append({
             'id': task.id,
             'project_name': task.project_name,
             'session2': task.session2,
-            'time_created': start,
-            'time_finished': end
+            'start': task.time_created.isoformat(),  # Format ISO8601
+            'end': task.time_finished.isoformat()   # Format ISO8601
         })
 
     return jsonify({'status': 'success', 'tasks': res}), 200

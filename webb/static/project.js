@@ -21,7 +21,6 @@ function fetchTasks(date = null) {
 }
 
 fetchTasks()
-
 function renderList(projectName, sessionTime, timeCreated, timeFinished) {
     const table = document.getElementById('projectTable');
     const row = table.insertRow();
@@ -35,9 +34,25 @@ function renderList(projectName, sessionTime, timeCreated, timeFinished) {
     projectCell.innerHTML = projectName;
     sessionCell.innerHTML = sessionTime;
 
-    // Gunakan format ISO untuk waktu
-    timeCreatedCell.innerHTML = new Date(timeCreated).toISOString();
-    timeFinishedCell.innerHTML = new Date(timeFinished).toISOString();
+    // Fungsi untuk memformat waktu
+    const formatDateTime = (date) => {
+        const d = new Date(date);
+        if (isNaN(d.getTime())) {
+            console.error(`Invalid date: ${date}`); // Debug untuk melihat masalah
+            return 'Invalid Date'; // Tangani nilai yang tidak valid
+        }
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0'); // Bulan dimulai dari 0
+        const year = d.getFullYear();
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        const seconds = String(d.getSeconds()).padStart(2, '0');
+        return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+    };
+
+    // Format waktu dengan validasi
+    timeCreatedCell.innerHTML = formatDateTime(timeCreated);
+    timeFinishedCell.innerHTML = formatDateTime(timeFinished);
 
     const finishedTime = new Date(timeFinished).getTime();
     const now = new Date().getTime();
@@ -47,17 +62,18 @@ function renderList(projectName, sessionTime, timeCreated, timeFinished) {
         statusCell.style.color = 'red'; // Warna merah untuk Time Out
     } else {
         statusCell.innerHTML = 'Pending';
-        statusCell.style.color = 'yellow'; // Warna hijau untuk Pending
+        statusCell.style.color = 'yellow'; // Warna kuning untuk Pending
     }
 
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'delete-btn1';
     deleteBtn.innerHTML = 'Delete';
-    deleteBtn.onclick = function() {
+    deleteBtn.onclick = function () {
         table.deleteRow(row.rowIndex);
     };
     actionCell.appendChild(deleteBtn);
 }
+
 
 
 function addProject() {

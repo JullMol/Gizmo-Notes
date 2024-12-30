@@ -1724,7 +1724,7 @@ td {
     color: black;
 }
 
-.delete-btn {
+.delete-btn1 {
     background-color: #E74C3C;
     color: white;
     border: none;
@@ -1732,7 +1732,7 @@ td {
     padding: 5px 10px;
     cursor: pointer;
 }
-.delete-btn:hover {
+.delete-btn1:hover {
     background-color: #C0392B;
 }
 
