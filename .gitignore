@@ -7,3 +7,4 @@ migrations
 instance
 webb\templates\test.html
 webb\static\local_database.db
+webb\instance\pythonanywhere\local_database.db
