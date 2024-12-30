@@ -5,6 +5,7 @@ import requests
 from dotenv import load_dotenv
 import os
 import uuid
+from flask_login import login_required, current_user
 
 load_dotenv(".env")
 DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN") 
@@ -16,67 +17,8 @@ group = Blueprint('group', __name__)
 members = []
 schedules = []
 
-@group.route('/')
-def index():
-    return render_template('home.html')
-
-@group.route('/home.html')
-def menu():
-    return render_template('home.html')
-
-@group.route('/search.html')
-def search():
-    return render_template('search.html')
-
-@group.route('/timer.html')
-def pomo():
-    return render_template('timer.html')
-
-@group.route('/notesD.html')
-def notesD():
-    return render_template('notesD.html')
-
-@group.route('/notesG.html')
-def notesG():
-    return render_template('notesG.html')
-
-@group.route('/Day.html')
-def Day():
-    return render_template('Day.html')
-
-@group.route('/Assignment.html')
-def Assignment():
-    return render_template('Assignment.html')
-
-@group.route('/Event.html')
-def Event():
-    return render_template('Event.html')
-
-@group.route('/Reports.html')
-def Reports():
-    return render_template('Reports.html')
-
-@group.route('/Goals.html')
-def Goals():
-    return render_template('Goals.html')
-
-@group.route('/Group.html')
-def Gizmo():
-    return render_template('Group.html')
-
-@group.route('/Calendar.html')
-def Calendar():
-    return render_template('Calendar.html')
-
-@group.route('/Invite.html')
-def Vite():
-    return render_template('Invite.html')
-
-@group.route('/invite')
-def invi():
-    return render_template('Invite.html')
-
 @group.route('/members', methods=['GET', 'POST'])
+@login_required
 def manage_members():
     global members
     if request.method == 'GET':
@@ -108,6 +50,7 @@ def manage_members():
             return jsonify({"error": str(e)}), 500
     
 @group.route('/api/members/<string:member_id>', methods=['DELETE'])
+@login_required
 def delete_member(member_id):
     global members
     try:
@@ -118,6 +61,7 @@ def delete_member(member_id):
         return jsonify({"error": str(e)}), 500
     
 @group.route('/api/add_schedule', methods=['POST'])
+@login_required
 def add_schedule():
     try:
         # Ambil data schedule dari request
@@ -134,7 +78,8 @@ def add_schedule():
         new_schedule = Schedule(
             date=date_s,
             subject=schedule_data['subject'],
-            link=schedule_data['link']
+            link=schedule_data['link'],
+            user_id=current_user.id
         )
         
         db.session.add(new_schedule)
@@ -154,10 +99,11 @@ def add_schedule():
         return jsonify({"error": str(e)}), 500
 
 @group.route('/api/get_schedules', methods=['GET'])
+@login_required
 def get_schedules():
     try:
         # Query semua jadwal dari database
-        all_schedules = Schedule.query.all()
+        all_schedules = Schedule.query.filter_by(user_id=current_user.id).all()
 
         # Format data untuk dikembalikan
         schedules_list = [
@@ -175,11 +121,12 @@ def get_schedules():
         return jsonify({"error": str(e)}), 500
 
 @group.route('/api/schedules/<string:schedule_id>', methods=['DELETE'])
+@login_required
 def delete_schedule(schedule_id):
     global schedules
     try:
         # Cari jadwal berdasarkan ID
-        schedule_to_delete = Schedule.query.get(schedule_id)
+        schedule_to_delete = Schedule.query.filter_by(user_id=current_user.id).get(schedule_id)
 
         if not schedule_to_delete:
             return jsonify({"error": "Schedule not found"}), 404
@@ -193,6 +140,7 @@ def delete_schedule(schedule_id):
         return jsonify({"error": str(e)}), 500
 
 @group.route('/api/bot_invite', methods=['GET'])
+@login_required
 def bot_invite():
     invite_link = "https://discord.gg/aX78aErJzG"
     return jsonify({"invite_link": invite_link}), 200

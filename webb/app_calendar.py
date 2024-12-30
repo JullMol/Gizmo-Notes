@@ -1,67 +1,12 @@
 from flask import Flask, render_template, Blueprint, jsonify, request
 from .database import db, ccalendar
 from datetime import datetime
+from flask_login import login_required, current_user
 calendar = Blueprint('calendar', __name__)
 
 # calendar = []
-
-@calendar.route('/')
-def index():
-    return render_template('home.html')
-
-@calendar.route('/home.html')
-def menu():
-    return render_template('home.html')
-
-@calendar.route('/search.html')
-def search():
-    return render_template('search.html')
-
-@calendar.route('/timer.html')
-def pomo():
-    return render_template('timer.html')
-
-@calendar.route('/notesD.html')
-def notesD():
-    return render_template('notesD.html')
-
-@calendar.route('/notesG.html')
-def notesG():
-    return render_template('notesG.html')
-
-@calendar.route('/Day.html')
-def Day():
-    return render_template('Day.html')
-
-@calendar.route('/Assignment.html')
-def Assignment():
-    return render_template('Assignment.html')
-
-@calendar.route('/Event.html')
-def Event():
-    return render_template('Event.html')
-
-@calendar.route('/Reports.html')
-def Reports():
-    return render_template('Reports.html')
-
-@calendar.route('/Goals.html')
-def Goals():
-    return render_template('Goals.html')
-
-@calendar.route('/Group.html')
-def Group():
-    return render_template('Group.html')
-
-@calendar.route('/Calendar.html')
-def Calendar():
-    return render_template('Calendar.html')
-
-@calendar.route('/Invite.html')
-def invite():
-    return render_template('Invite.html')
-
 @calendar.route('/calendar', methods=['POST'])
+@login_required
 def calendar1():
     data = request.get_json()
     tanggal = data.get('tanggal')
@@ -75,7 +20,8 @@ def calendar1():
         else:
             calendar_table = ccalendar(
                 name=data.get('name'),
-                colour=data.get('colour')
+                colour=data.get('colour'),
+                user_id=current_user.id
             )
             db.session.add(calendar_table)
             db.session.commit()
@@ -84,8 +30,9 @@ def calendar1():
         return jsonify({'success': False, 'message': str(e), 'save': False})
 
 @calendar.route('/getcalendar', methods=['GET'])
+@login_required
 def getcalendar():
-    tasks_ = ccalendar.query.all()
+    tasks_ = ccalendar.query.filter_by(user_id=current_user.id).all()
     res = []
     for task in tasks_:
         res.append(
@@ -99,6 +46,7 @@ def getcalendar():
     return jsonify({'status': 'success', 'tasks': res}), 200
 
 @calendar.route('/delete-session/<int:id>', methods=['GET'])
+@login_required
 def delete_session(id):
     try:
         session = ccalendar.query.get(id)
@@ -107,6 +55,3 @@ def delete_session(id):
         return jsonify({'success': True, "message": "Session deleted successfully"})
     except Exception as e:
         return jsonify({'success':False, 'message': str(e)}), 400
-
-if __name__ == '__main__':
-    calendar.run(debug=True)

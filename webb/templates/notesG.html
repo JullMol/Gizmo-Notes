@@ -12,7 +12,6 @@
                 <ul>
                     <li><a href="search.html" id="searchLink" class="search-button"><i class="fas fa-search"></i> Search</a></li>
                     <li><a href="home.html" id="homeLink"><i class="fas fa-home"></i> Home</a></li>
-                    <li><a href="test.html"><i class="fas fa-inbox"></i> Inbox</a></li>
                 </ul>
     
                 <h2>TRACK</h2>
@@ -45,7 +44,7 @@
     
             <div class="bottom-links">
                 <ul>
-                    <li><a href="#"><i class="fas fa-info-circle"></i> Log Out</a></li>
+                    <li><a href="/logout"><i class="fas fa-info-circle"></i> Log Out</a></li>
                     <li><a href="Invite.html" id="inviteMembersLink"><i class="fas fa-user-plus"></i> Invite Members</a></li>
                 </ul>
             </div>
@@ -56,15 +55,15 @@
             <h2>Grouped Notes</h2>
             <div class="note-grid-grouped">
                 <div class="note-card-grouped">
-                    <img src="Monday.jpg" alt="Group 1 Notes" class="note-image-grouped" data-group="Group 1">
+                    <img src="{{url_for('static', filename='14.png')}}" alt="Group 1 Notes" class="note-image-grouped" data-group="Group 1">
                     <div class="saved-notes-grouped" id="group1Notes"></div>
                 </div>
                 <div class="note-card-grouped">
-                    <img src="Group2.jpg" alt="Group 2 Notes" class="note-image-grouped" data-group="Group 2">
+                    <img src="{{url_for('static', filename='15.png')}}" alt="Group 2 Notes" class="note-image-grouped" data-group="Group 2">
                     <div class="saved-notes-grouped" id="group2Notes"></div>
                 </div>
                 <div class="note-card-grouped">
-                    <img src="Group3.jpg" alt="Group 3 Notes" class="note-image-grouped" data-group="Group 3">
+                    <img src="{{url_for('static', filename='16.png')}}" alt="Group 3 Notes" class="note-image-grouped" data-group="Group 3">
                     <div class="saved-notes-grouped" id="group3Notes"></div>
                 </div>
             </div>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Information</title>
+    <style>
+        /* Basic Styles */
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Wrapper for centering */
+        .email-wrapper {
+            width: 100%;
+            background-color: #f4f7fc;
+            padding: 40px 0;
+        }
+        .email-content {
+            background-color: #ffffff;
+            width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Heading and Subheading */
+        .email-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .email-header h2 {
+            font-size: 24px;
+            color: #5e63ff;
+        }
+        .email-header p {
+            font-size: 16px;
+            color: #777;
+        }
+
+        /* Footer */
+        .email-footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #777;
+        }
+        .email-footer p {
+            margin: 5px;
+        }
+
+        /* Responsive Styles */
+        @media screen and (max-width: 600px) {
+            .email-content {
+                width: 100%;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <div class="email-content">
+            <!-- Email Header -->
+            <div class="email-header">
+                <h2>Login Information</h2>
+                <p>Your account has been registered on the gizmonotes website</p>
+            </div>
+
+            <!-- Footer -->
+            <div class="email-footer">
+                <h2>Your Login Information</h2>
+                <p>Username: {{ username }}</p>
+                <p>Password: {{ password }}</p>
+                <p>Please keep this information secure and do not share it with anyone.</p>
+                <p>click this link for more information about our website:</p>
+                <p>&copy; Gizmonotes</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
