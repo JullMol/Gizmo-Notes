@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands, tasks
 from discord.utils import get
-# from flask import Flask
-# # from threading import Thread
+from flask import Flask
+from threading import Thread
 import asyncio
 import requests
 import wave
@@ -12,15 +12,17 @@ import os
 from fpdf import FPDF
 import csv
 from datetime import datetime
-from .database import Member, Record, Users, db
+from database import Member, Record, Users, db
 from flask_sqlalchemy import SQLAlchemy
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from . import app
+import requests
 
 # Load environment variables
 load_dotenv()
+
+
 
 FLASK_SERVER_URL = os.getenv("FLASK_SERVER_URL")
 FLASK_API_URL = os.getenv("FLASK_API_URL")
@@ -32,19 +34,21 @@ sender_password = os.getenv("GMAIL_PASSWORD")
 if not BOT_TOKEN:
     raise ValueError("Bot token is missing! Please check your .env file.")
 
+path_db = os.path.join(os.getcwd(), 'instance/pythonanywhere')
+
 # Flask App
-# app = Flask(__name__)
+app = Flask(__name__, instance_path= path_db)
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local_database.db'
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# db.init_app(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(app.instance_path,'local_database.db')}'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
 
-# @app.route("/")
-# def home():
-    # return "Hello from Flask!"
+@app.route("/")
+def home():
+    return "Hello from Flask!"
 
-# def run_flask():
-    # app.run(host="0.0.0.0", port=5000)
+def run_flask():
+    app.run(host="0.0.0.0", port=5000)
 
 # Discord Bot
 intents = discord.Intents.default()
@@ -67,6 +71,19 @@ is_recording = False
 voice_client = None
 recording_data = []
 
+def download_database():
+    url = 'https://gizmonote.pythonanywhere.com/static/local_database.db'
+
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        with open(f'{path_db}/local_database.db', 'wb') as file:
+            file.write(response.content)
+
+        print('Database downloaded successfully.')
+    else:
+        print('Failed to download the database.')
+        
 @bot.event
 async def on_member_update(before, after):
     guild = after.guild
@@ -112,14 +129,14 @@ async def on_member_join(member):
     except discord.HTTPException as e:
         print(f"Something error: {e}")
 
-# @bot.event
-# async def on_ready():
-#     global flask_thread_started
-#     print(f"Bot {bot.user} is ready!")
-#     if not flask_thread_started:
-#         flask_thread_started = True
-#         thread = Thread(target=run_flask)
-#         thread.start()
+@bot.event
+async def on_ready():
+    global flask_thread_started
+    print(f"Bot {bot.user} is ready!")
+    if not flask_thread_started:
+        flask_thread_started = True
+        thread = Thread(target=run_flask)
+        thread.start()
 
 @bot.command()
 async def hello(ctx):
@@ -153,6 +170,7 @@ async def ping(ctx):
 @bot.command()
 async def get_id(ctx, email: str):
     try:
+        download_database()
         with app.app_context():
             # Query user berdasarkan email
             user = Users.query.filter_by(email=email).first()
@@ -794,6 +812,7 @@ async def email_invite(ctx, channel_name: str, user_id: int = None):
     await ctx.send(f"Starting to send invite links for channel `{channel_name}`...")
 
     try:
+        download_database()
         # Cari channel berdasarkan nama
         guild = ctx.guild
         channel = discord.utils.get(guild.channels, name=channel_name)
@@ -865,5 +884,6 @@ async def email_invite(ctx, channel_name: str, user_id: int = None):
     except Exception as e:
         await ctx.send(f"An error occurred: {str(e)}")
 
-def run_bot():
+if __name__ == '__main__':
+    download_database()
     bot.run(BOT_TOKEN)
