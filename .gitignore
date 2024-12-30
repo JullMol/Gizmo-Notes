@@ -5,3 +5,4 @@ webb\.env
 .env
 migrations
 instance
+webb\templates\test.html
