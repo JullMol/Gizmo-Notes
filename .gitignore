@@ -6,3 +6,4 @@ webb\.env
 migrations
 instance
 webb\templates\test.html
+webb\static\local_database.db

@@ -16,7 +16,7 @@ migrate = Migrate()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 def create_app():
     # Konfigurasi database
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_name}'  # Menggunakan SQLite
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(app.static_folder ,DB_name)}'  # Menggunakan SQLite
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -72,10 +72,10 @@ def create_app():
 #     invite_link = os.getenv('personal_bot_link')
 #     return {"invite_link": invite_link}, 200
 
-@app.route('/run_bot', methods=['GET'])
-def run_bot():
-    from .tes import run_bot
-    try:
-        run_bot()
-    except Exception as e:
-        return str(e), 500
+# @app.route('/run_bot', methods=['GET'])
+# def run_bot():
+#     from .tes import run_bot
+#     try:
+#         run_bot()
+#     except Exception as e:
+#         return str(e), 500
